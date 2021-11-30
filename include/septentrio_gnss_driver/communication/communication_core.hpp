@@ -103,14 +103,15 @@ namespace io_comm_rx {
      * @brief Handles communication with and configuration of the mosaic (and beyond)
      * receiver(s)
      */
+    template<class NodeT>
     class Comm_IO
     {
     public:
         /**
-         * @brief Default constructor of the class Comm_IO
+         * @brief Constructor of the class Comm_IO
+         * @param[in] node Pointer to node
          */
-        Comm_IO(std::shared_ptr<ros::NodeHandle> pNh, Settings* settings);
-
+        Comm_IO(NodeT node, std::shared_ptr<ros::NodeHandle> pNh, Settings* settings);
         /**
          * @brief Default destructor of the class Comm_IO
          */
@@ -213,6 +214,8 @@ namespace io_comm_rx {
          */
         void send(std::string cmd);
 
+         //! Pointer to Node
+        NodeT node_;
         //! Callback handlers for the inwards streaming messages
         CallbackHandlers handlers_;
         //! Settings
@@ -259,5 +262,7 @@ namespace io_comm_rx {
         const static unsigned int SET_BAUDRATE_SLEEP_ = 500000;
     };
 } // namespace io_comm_rx
+
+#include <septentrio_gnss_driver/communication/communication_core.cpp>
 
 #endif // for COMMUNICATION_CORE_HPP

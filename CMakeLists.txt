@@ -153,6 +153,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
+  src
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
 )
@@ -175,7 +176,7 @@ add_executable(${PROJECT_NAME}_node
     src/septentrio_gnss_driver/parsers/nmea_parsers/gpgsa.cpp 
     src/septentrio_gnss_driver/parsers/nmea_parsers/gpgsv.cpp 
     src/septentrio_gnss_driver/crc/crc.cpp
-    src/septentrio_gnss_driver/communication/communication_core.cpp 
+    #src/septentrio_gnss_driver/communication/communication_core.cpp 
     src/septentrio_gnss_driver/communication/rx_message.cpp 
     src/septentrio_gnss_driver/communication/callback_handlers.cpp
     src/septentrio_gnss_driver/communication/pcap_reader.cpp

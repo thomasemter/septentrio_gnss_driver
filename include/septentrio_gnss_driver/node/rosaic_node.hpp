@@ -180,7 +180,14 @@ namespace rosaic_node {
          *
          * The other ROSaic parameters are specified via the command line.
          */
-        void getROSParams();        
+        void getROSParams();
+
+        /**
+         * @brief Log function to provide abstraction of ROS loggers
+         * @param[in] s String to log
+         * @param[in] logLevel Log level
+         */
+        void log(LogLevel logLevel, const std::string& s);     
 
     private:
         //! Node handle pointer
@@ -188,7 +195,7 @@ namespace rosaic_node {
         //! Settings
         Settings settings_;
         //! Handles communication with the Rx
-        io_comm_rx::Comm_IO IO_;
+        io_comm_rx::Comm_IO<ROSaicNode*> IO_;
     };
 } // namespace rosaic_node
 
