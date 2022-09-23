@@ -650,37 +650,10 @@ void io_comm_rx::Comm_IO::configureRx()
            // we need to forward the corrections ourselves, though not on the same
            // port.
     {
-        if (proto == "tcp")
-        {
-            {
-                std::stringstream ss;
-                // In case IPS1 was used before, old configuration is lost of course.
-                ss << "siss, IPS1, "
-                   << std::to_string(settings_->rx_input_corrections_tcp)
-                   << ", TCP2Way \x0D";
-                send(ss.str());
-            }
-            {
-                std::stringstream ss;
-                ss << "sno, Stream" << std::to_string(stream) << ", IPS1, GGA, "
-                   << pvt_interval << " \x0D";
-                ++stream;
-                send(ss.str());
-            }
-        }
-        {
-            std::stringstream ss;
-            if (proto == "tcp")
-            {
-                ss << "sdio, IPS1, " << settings_->rtcm_version
-                   << ", +SBF+NMEA \x0D";
-            } else
-            {
-                ss << "sdio, " << settings_->rx_input_corrections_serial << ", "
-                   << settings_->rtcm_version << ", +SBF+NMEA \x0D";
-            }
-            send(ss.str());
-        }
+        std::stringstream ss;
+        ss << "sdio, " << settings_->rx_input_corrections_serial << ", "
+           << settings_->rtcm_version << ", +SBF+NMEA \x0D";
+        send(ss.str());
     }
 
     // Setting multi antenna
