@@ -122,6 +122,8 @@ namespace io {
 
     void TelegramHandler::handleCd(const std::shared_ptr<Telegram>& telegram)
     {
+        node_->log(log_level::INFO, "message " +
+                                                std::string(telegram->message.begin(), telegram->message.end()));
         if (cdCtr_ < 2)
         {
             mainConnectionDescriptor_ =

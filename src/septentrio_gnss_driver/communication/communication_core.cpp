@@ -72,7 +72,7 @@ namespace io {
     {
         if (!settings_->read_from_sbf_log && !settings_->read_from_pcap)
         {
-            resetMainConnection();
+            resetMainConnection(1);
             send("sdio, " + streamPort_ + ", auto, none\x0D");
             for (auto ntrip : settings_->rtk_settings.ntrip)
             {
@@ -229,21 +229,22 @@ namespace io {
         boost::regex_match(settings_->device, match,
                            boost::regex("(tcp)://(.+):(\\d+)"));
         std::string proto(match[1]);
-        mainConnectionPort_ = resetMainConnection();
-        // streamPort_ = "IPS1"; // TODO UDP
-        streamPort_ = mainConnectionPort_;
+        
         if (proto == "tcp")
         {
-            // mainConnectionPort_ = manager_->getConnectionDescriptor();
+            mainConnectionPort_ = resetMainConnection(2);
+            // streamPort_ = "IPS1"; // TODO UDP
+            streamPort_ = mainConnectionPort_;
         } else
         {
-            // TODO check if rx_serial_portcan be removed
-            mainConnectionPort_ = settings_->rx_serial_port;
+            mainConnectionPort_ = resetMainConnection(1);
+            // streamPort_ = "IPS1"; // TODO UDP
+            streamPort_ = mainConnectionPort_;
             // After booting, the Rx sends the characters "x?" to all ports, which
             // could potentially mingle with our first command. Hence send a
             // safeguard command "lif", whose potentially false processing is
             // harmless.
-            send("lif, Identification \x0D");
+            manager_->send("lif, Identification \x0D");
         }
 
         node_->log(log_level::INFO, "Setting up Rx.");
@@ -836,12 +837,12 @@ namespace io {
             manager_.get()->send(velNmea);
     }
 
-    std::string CommunicationCore::resetMainConnection()
+    std::string CommunicationCore::resetMainConnection(uint8_t numResponses)
     {
         // Escape sequence (escape from correction mode), ensuring that we
         // can send our real commands afterwards...
         std::string cmd("\x0DSSSSSSSSSSSSSSSSSSS\x0D\x0D");
-        telegramHandler_.resetWaitforMainCd();
+        telegramHandler_.resetWaitforMainCd(numResponses);
         manager_.get()->send(cmd);
         return telegramHandler_.getMainCd();
     }

@@ -118,12 +118,12 @@ namespace io {
         void handleTelegram(const std::shared_ptr<Telegram>& telegram);
 
         //! Returns the connection descriptor
-        void resetWaitforMainCd()
+        void resetWaitforMainCd(uint8_t numResponses)
         {
             // Cd is sent twice only after startup
             if (init_ == false)
             {
-                cdCtr_ = 0;
+                cdCtr_ = 2 - numResponses;
                 init_ = true;
             } else
                 cdCtr_ = 1;

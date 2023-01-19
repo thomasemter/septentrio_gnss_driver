@@ -546,7 +546,6 @@ namespace io {
                                    "Buffer: " +
                                        std::string(telegram_->message.begin(),
                                                    telegram_->message.end()));*/
-
                         switch (buf_[0])
                         {
                         case SYNC_BYTE_1:

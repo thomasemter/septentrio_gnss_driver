@@ -135,7 +135,7 @@ namespace io {
          * @brief Reset main connection so it can receive commands
          * @return Main connection descriptor
          */
-        std::string resetMainConnection();
+        std::string resetMainConnection(uint8_t numResponses);
 
         void processTelegrams();
 
