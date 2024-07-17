@@ -1362,7 +1362,6 @@ namespace io {
         static auto last_ins_tow = last_insnavgeod_.block_header.tow;
 
         NavSatFixMsg msg;
-        uint16_t mask = 15; // We extract the first four bits using this mask.
         if (settings_->septentrio_receiver_type == "gnss")
         {
             if ((!validValue(last_pvtgeodetic_.block_header.tow)) ||
@@ -1372,7 +1371,8 @@ namespace io {
 
             msg.header = last_pvtgeodetic_.header;
 
-            switch (last_pvtgeodetic_.mode)
+            uint8_t type_of_pvt = last_pvtgeodetic_.mode & 15;
+            switch (type_of_pvt)
             {
             case evNoPVT:
             {
@@ -1480,7 +1480,8 @@ namespace io {
 
             msg.header = last_insnavgeod_.header;
 
-            switch (last_insnavgeod_.gnss_mode)
+            uint8_t type_of_pvt = last_insnavgeod_.gnss_mode & 15;
+            switch (type_of_pvt)
             {
             case evNoPVT:
             {
@@ -1766,7 +1767,8 @@ namespace io {
         {
             msg.header = last_pvtgeodetic_.header;
 
-            switch (last_pvtgeodetic_.mode)
+            uint8_t type_of_pvt = last_pvtgeodetic_.mode & 15;
+            switch (type_of_pvt)
             {
             case evNoPVT:
             {
@@ -1943,7 +1945,8 @@ namespace io {
         {
             msg.header = last_insnavgeod_.header;
 
-            switch (last_insnavgeod_.gnss_mode)
+            uint8_t type_of_pvt = last_insnavgeod_.gnss_mode & 15;
+            switch (type_of_pvt)
             {
             case evNoPVT:
             {
