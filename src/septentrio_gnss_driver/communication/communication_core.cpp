@@ -82,6 +82,8 @@ namespace io {
         processingThread_.join();
     }
 
+    void CommunicationCore::close() { manager_->close(); }
+
     void CommunicationCore::resetSettings()
     {
         if (!manager_->connected())
@@ -171,22 +173,11 @@ namespace io {
             "Started timer for calling connect() method until connection succeeds");
 
         boost::asio::io_service io;
-        boost::posix_time::millisec wait_ms(
-            static_cast<uint32_t>(settings_->reconnect_delay_s * 1000));
         if (initializeIo())
         {
-            while (running_ && node_->ok())
-            {
-                boost::asio::deadline_timer t(io, wait_ms);
-
-                if (manager_->connect())
-                {
-                    initializedIo_ = true;
-                    break;
-                }
-
-                t.wait();
-            }
+            initializedIo_ = manager_->connect();
+            if (!initializedIo_)
+                return;
         }
         // If node is shut down before a connection could be established
         if (!node_->ok())

@@ -93,6 +93,8 @@ namespace io {
         virtual ~AsyncManagerBase() {}
         //! Connects the stream
         [[nodiscard]] virtual bool connect() = 0;
+
+        virtual void close() = 0;
         //! Sends commands to the receiver
         virtual void send(const std::string& cmd) = 0;
         bool connected() { return false; };
@@ -119,6 +121,8 @@ namespace io {
         ~AsyncManager();
 
         [[nodiscard]] bool connect();
+
+        void close();
 
         void setPort(const std::string& port);
 
@@ -172,16 +176,8 @@ namespace io {
     AsyncManager<IoType>::~AsyncManager()
     {
         running_ = false;
-        ioInterface_.close();
-        node_->log(log_level::DEBUG, "AsyncManager shutting down threads");
-        if (ioThread_.joinable())
-        {
-            ioService_->stop();
-            ioThread_.join();
-        }
-        if (watchdogThread_.joinable())
-            watchdogThread_.join();
-        node_->log(log_level::DEBUG, "AsyncManager threads stopped");
+        if (connected_)
+            close();
     }
 
     template <typename IoType>
@@ -197,6 +193,21 @@ namespace io {
         receive();
 
         return true;
+    }
+
+    template <typename IoType>
+    void AsyncManager<IoType>::close()
+    {
+        ioInterface_.close();
+        node_->log(log_level::DEBUG, "AsyncManager shutting down threads");
+        if (ioThread_.joinable())
+        {
+            ioService_->stop();
+            ioThread_.join();
+        }
+        if (watchdogThread_.joinable())
+            watchdogThread_.join();
+        node_->log(log_level::DEBUG, "AsyncManager threads stopped");
     }
 
     template <typename IoType>

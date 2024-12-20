@@ -199,4 +199,4 @@ ins_vsm:
 
 # logger
 
-activate_debug_log: false
+activate_debug_log: true
