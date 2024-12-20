@@ -258,7 +258,6 @@ namespace io {
         {
             deadline_.cancel();
             stream_->close();
-            stream_->close();
         }
 
         void setPort(const std::string& port) { port_ = port; }
