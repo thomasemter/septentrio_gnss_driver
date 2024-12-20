@@ -101,6 +101,7 @@ typedef geometry_msgs::Quaternion QuaternionMsg;
 typedef geometry_msgs::PoseWithCovarianceStamped PoseWithCovarianceStampedMsg;
 typedef geometry_msgs::TwistWithCovarianceStamped TwistWithCovarianceStampedMsg;
 typedef geometry_msgs::TransformStamped TransformStampedMsg;
+typedef geometry_msgs::Vector3 Vector3Msg;
 typedef gps_common::GPSFix GpsFixMsg;
 typedef gps_common::GPSStatus GpsStatusMsg;
 typedef sensor_msgs::NavSatFix NavSatFixMsg;
@@ -186,7 +187,8 @@ class ROSaicNodeBase
 {
 public:
     ROSaicNodeBase() :
-        pNh_(new ros::NodeHandle("~")), tfListener_(tfBuffer_), lastTfStamp_(0)
+        pNh_(std::make_shared<ros::NodeHandle>("~")), tfListener_(tfBuffer_),
+        lastTfStamp_(0)
     {
     }
 
@@ -434,10 +436,10 @@ private:
         if (stamp == 0)
             stamp = getTime();
 
-        static Eigen::Vector3d vel = Eigen::Vector3d::Zero();
-        static Eigen::Vector3d var = Eigen::Vector3d::Zero();
-        static uint64_t ctr = 0;
-        static Timestamp lastStamp = 0;
+        thread_local Eigen::Vector3d vel = Eigen::Vector3d::Zero();
+        thread_local Eigen::Vector3d var = Eigen::Vector3d::Zero();
+        thread_local uint64_t ctr = 0;
+        thread_local Timestamp lastStamp = 0;
 
         ++ctr;
         vel[0] += twist.twist.linear.x;

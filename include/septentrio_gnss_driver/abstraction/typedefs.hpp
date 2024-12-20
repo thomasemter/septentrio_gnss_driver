@@ -109,6 +109,7 @@ typedef geometry_msgs::msg::Quaternion QuaternionMsg;
 typedef geometry_msgs::msg::PoseWithCovarianceStamped PoseWithCovarianceStampedMsg;
 typedef geometry_msgs::msg::TwistWithCovarianceStamped TwistWithCovarianceStampedMsg;
 typedef geometry_msgs::msg::TransformStamped TransformStampedMsg;
+typedef geometry_msgs::msg::Vector3 Vector3Msg;
 typedef gps_msgs::msg::GPSFix GpsFixMsg;
 typedef gps_msgs::msg::GPSStatus GpsStatusMsg;
 typedef sensor_msgs::msg::NavSatFix NavSatFixMsg;
@@ -470,10 +471,10 @@ private:
         if (stamp == 0)
             stamp = getTime();
 
-        static Eigen::Vector3d vel = Eigen::Vector3d::Zero();
-        static Eigen::Vector3d var = Eigen::Vector3d::Zero();
-        static uint64_t ctr = 0;
-        static Timestamp lastStamp = 0;
+        thread_local Eigen::Vector3d vel = Eigen::Vector3d::Zero();
+        thread_local Eigen::Vector3d var = Eigen::Vector3d::Zero();
+        thread_local uint64_t ctr = 0;
+        thread_local Timestamp lastStamp = 0;
 
         ++ctr;
         vel[0] += twist.twist.linear.x;
