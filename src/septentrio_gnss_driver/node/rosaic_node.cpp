@@ -69,6 +69,11 @@ rosaic_node::ROSaicNode::ROSaicNode(const rclcpp::NodeOptions& options) :
     this->log(log_level::DEBUG, "Leaving ROSaicNode() constructor..");
 }
 
+rosaic_node::ROSaicNode::~ROSaicNode()
+{
+    this->log(log_level::DEBUG, "Called ROSaicNode() destructor..");
+}
+
 [[nodiscard]] bool rosaic_node::ROSaicNode::getROSParams()
 {
     param("ntp_server", settings_.ntp_server, false);

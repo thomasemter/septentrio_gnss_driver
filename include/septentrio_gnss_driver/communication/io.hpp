@@ -39,7 +39,6 @@
 
 // Boost
 #include <boost/asio.hpp>
-#include <boost/asio/deadline_timer.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
@@ -247,21 +246,14 @@ namespace io {
     public:
         TcpIo(ROSaicNodeBase* node,
               std::shared_ptr<boost::asio::io_service> ioService) :
-            node_(node), ioService_(ioService), deadline_(*ioService_)
+            node_(node), ioService_(ioService)
         {
             port_ = node_->settings()->device_tcp_port;
-
-            deadline_.expires_at(boost::posix_time::pos_infin);
-            checkDeadline();
         }
 
-        ~TcpIo() { stream_->close(); }
+        ~TcpIo() { close(); }
 
-        void close()
-        {
-            deadline_.cancel();
-            stream_->close();
-        }
+        void close() { stream_->cancel(); }
 
         void setPort(const std::string& port) { port_ = port; }
 
@@ -291,9 +283,16 @@ namespace io {
 
             try
             {
-                boost::system::error_code ec = connectInternal(endpointIterator);
-                while (node_->ok() && ec)
+                boost::system::error_code ec;
+
+                while (node_->ok())
                 {
+                    stream_->connect(*endpointIterator, ec);
+                    if (!ec)
+                        break;
+                    else if (!node_->ok())
+                        return false;
+
                     node_->log(
                         log_level::ERROR,
                         "TCP connection to " +
@@ -301,14 +300,14 @@ namespace io {
                             " on port " +
                             std::to_string(endpointIterator->endpoint().port()) +
                             " failed: " + ec.message() + ". Retrying ...");
-                    using namespace std::chrono_literals;
-                    std::this_thread::sleep_for(1s);
-                    ec = connectInternal(endpointIterator);
                 }
-                if (ec)
-                    return false;
 
-            } catch (const std::runtime_error& e)
+                stream_->set_option(boost::asio::ip::tcp::no_delay(true));
+
+                node_->log(log_level::INFO,
+                           "Connected to " + endpointIterator->host_name() + ":" +
+                               endpointIterator->service_name() + ".");
+            } catch (std::runtime_error& e)
             {
                 node_->log(log_level::ERROR,
                            "Could not connect to " + endpointIterator->host_name() +
@@ -317,45 +316,12 @@ namespace io {
                 return false;
             }
 
-            deadline_.expires_at(boost::posix_time::pos_infin);
-            stream_->set_option(boost::asio::ip::tcp::no_delay(true));
-            node_->log(log_level::INFO, "Connected to " +
-                                            endpointIterator->host_name() + ":" +
-                                            endpointIterator->service_name() + ".");
             return true;
         }
 
     private:
-        boost::system::error_code connectInternal(
-            const boost::asio::ip::tcp::resolver::iterator& endpointIterator)
-        {
-            boost::system::error_code ec;
-            deadline_.expires_from_now(boost::posix_time::seconds(10));
-            ec = boost::asio::error::would_block;
-            boost::asio::async_connect(*stream_, endpointIterator,
-                                       boost::lambda::var(ec) = boost::lambda::_1);
-            do
-                ioService_->run_one();
-            while (node_->ok() && (ec == boost::asio::error::would_block));
-            return ec;
-        }
-
-        void checkDeadline()
-        {
-            if (deadline_.expires_at() <=
-                boost::asio::deadline_timer::traits_type::now())
-            {
-                boost::system::error_code ignored_ec;
-                stream_->close(ignored_ec);
-
-                deadline_.expires_at(boost::posix_time::pos_infin);
-            }
-            deadline_.async_wait(boost::lambda::bind(&TcpIo::checkDeadline, this));
-        }
-
         ROSaicNodeBase* node_;
         std::shared_ptr<boost::asio::io_service> ioService_;
-        boost::asio::deadline_timer deadline_;
 
         std::string port_;
 

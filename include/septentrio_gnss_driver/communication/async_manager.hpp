@@ -260,15 +260,8 @@ namespace io {
                 } else
                 {
                     connected_ = false;
-                    node_->log(log_level::ERROR,
-                               "AsyncManager connection lost. Trying to reconnect.");
-                    ioService_->reset();
-                    ioThread_.join();
-                    while (!ioInterface_.connect())
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                    connected_ = true;
-                    receive();
                 }
+
             } else if (running_ && std::is_same<TcpIo, IoType>::value)
             {
                 // Send to check if TCP connection still alive
@@ -276,6 +269,26 @@ namespace io {
                 boost::asio::async_write(
                     *(ioInterface_.stream_), boost::asio::buffer(empty.data(), 1),
                     [](boost::system::error_code ec, std::size_t /*length*/) {});
+            }
+
+            if (!connected_)
+            {
+                node_->log(log_level::ERROR,
+                           "AsyncManager connection lost. Trying to reconnect.");
+                ioService_->stop();
+                ioThread_.join();
+                ioInterface_.close();
+                while (!connected_ && node_->ok())
+                {
+                    node_->log(log_level::DEBUG,
+                               "AsyncManager connection lost. Reconnect.");
+                    connected_ = ioInterface_.connect();
+
+                    if (connected_)
+                        receive();
+                    else
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
             }
         }
     }
@@ -466,7 +479,14 @@ namespace io {
                 {
                     node_->log(log_level::DEBUG,
                                "AsyncManager sync read error: " + ec.message());
-                    resync();
+
+                    if ((boost::asio::error::eof == ec) ||
+                        (boost::asio::error::network_unreachable == ec) ||
+                        (boost::asio::error::interrupted == ec) ||
+                        (boost::asio::error::connection_reset == ec))
+                    {
+                        connected_ = false;
+                    }
                 }
             });
     }

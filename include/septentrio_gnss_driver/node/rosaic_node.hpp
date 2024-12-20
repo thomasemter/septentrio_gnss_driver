@@ -88,6 +88,8 @@ namespace rosaic_node {
         //! messages, and publishes requested ROS messages...
         ROSaicNode(const rclcpp::NodeOptions& options);
 
+        ~ROSaicNode();
+
     private:
         /**
          * @brief Gets the node parameters from the ROS Parameter Server, parts of

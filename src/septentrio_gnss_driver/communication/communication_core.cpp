@@ -197,9 +197,11 @@ namespace io {
         // and sets all its necessary corrections-related parameters
         if (!settings_->read_from_sbf_log && !settings_->read_from_pcap)
         {
-            node_->log(log_level::DEBUG, "Configure Rx.");
             if (settings_->configure_rx)
+            {
+                node_->log(log_level::DEBUG, "Configure Rx.");
                 configureRx();
+            }
         }
 
         node_->log(log_level::INFO, "Setup complete.");
