@@ -630,7 +630,10 @@ namespace io {
                         node_->log(log_level::DEBUG,
                                    "last_insnavgeod_.heading: " +
                                        std::to_string(last_insnavgeod_.heading));
-                }
+                } else
+                    node_->log(log_level::DEBUG,
+                               "last_insnavgeod_.sb_list: " +
+                                   std::to_string(last_insnavgeod_.sb_list));
                 if ((last_insnavgeod_.sb_list & 4) != 0)
                 {
                     // Attitude autocov
