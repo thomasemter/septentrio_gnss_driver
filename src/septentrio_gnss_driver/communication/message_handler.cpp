@@ -603,6 +603,10 @@ namespace io {
             if ((tsImu - tsIns) > maxDt)
             {
                 valid_orientation = false;
+                node_->log(log_level::DEBUG,
+                           "tsImu: " + std::to_string(tsImu) +
+                               ", tsIns: " + std::to_string(tsIns) +
+                               ", maxDt: " + std::to_string(maxDt));
             } else
             {
                 if ((last_insnavgeod_.sb_list & 2) != 0)
@@ -622,7 +626,10 @@ namespace io {
                         msg.orientation = convertEulerToQuaternionMsg(
                             0.0, 0.0, deg2rad(last_insnavgeod_.heading));
                         valid_orientation = true;
-                    }
+                    } else
+                        node_->log(log_level::DEBUG,
+                                   "last_insnavgeod_.heading: " +
+                                       std::to_string(last_insnavgeod_.heading));
                 }
                 if ((last_insnavgeod_.sb_list & 4) != 0)
                 {
@@ -672,7 +679,10 @@ namespace io {
                     }
                 }
             }
-        }
+        } else
+            node_->log(log_level::DEBUG,
+                       "last_insnavgeod_.block_header.tow: " +
+                           std::to_string(last_insnavgeod_.block_header.tow));
 
         if (!valid_orientation)
         {
