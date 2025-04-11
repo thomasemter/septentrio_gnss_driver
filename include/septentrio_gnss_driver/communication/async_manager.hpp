@@ -132,6 +132,7 @@ namespace io {
 
     private:
         void receive();
+        void monitorTimeout();
         void runIoContext();
         void runWatchdog();
         void write(const std::string& cmd);
@@ -151,6 +152,7 @@ namespace io {
         std::atomic<bool> running_;
         std::thread ioThread_;
         std::thread watchdogThread_;
+        boost::asio::steady_timer timer_;
 
         bool connected_ = false;
 
@@ -167,7 +169,8 @@ namespace io {
     AsyncManager<IoType>::AsyncManager(ROSaicNodeBase* node,
                                        TelegramQueue* telegramQueue) :
         node_(node), ioContext_(std::make_shared<boost::asio::io_context>()),
-        ioInterface_(node, ioContext_), telegramQueue_(telegramQueue)
+        ioInterface_(node, ioContext_), timer_(*ioContext_),
+        telegramQueue_(telegramQueue)
     {
         node_->log(log_level::DEBUG, "AsyncManager created.");
     }
@@ -232,6 +235,25 @@ namespace io {
     }
 
     template <typename IoType>
+    void AsyncManager<IoType>::monitorTimeout()
+    {
+        if constexpr (std::is_same<TcpIo, IoType>::value)
+        {
+            timer_.expires_after(std::chrono::seconds(100));
+            timer_.async_wait([this](const boost::system::error_code& error) {
+                if (!error)
+                {
+                    node_->log(log_level::ERROR, "AsyncStreamIo: Timeout occured!");
+                    connected_ = false;
+                    ioInterface_.close();
+                    if (!ioContext_->stopped())
+                        ioContext_->stop();
+                }
+            });
+        }
+    }
+
+    template <typename IoType>
     bool AsyncManager<IoType>::connected()
     {
         return connected_;
@@ -275,6 +297,7 @@ namespace io {
                 {
                     node_->log(log_level::ERROR,
                                "AsyncManager connection lost. Trying to reconnect.");
+                    ioContext_->restart();
                     ioThread_.join();
                     connected_ = ioInterface_.connect();
                     if (connected_)
@@ -495,6 +518,8 @@ namespace io {
                     }
                 }
             });
+
+        monitorTimeout();
     }
 
     template <typename IoType>
@@ -537,6 +562,8 @@ namespace io {
                     resync();
                 }
             });
+
+        monitorTimeout();
     }
 
     template <typename IoType>
@@ -577,6 +604,8 @@ namespace io {
                     resync();
                 }
             });
+
+        monitorTimeout();
     }
 
     template <typename IoType>
@@ -666,5 +695,7 @@ namespace io {
                     resync();
                 }
             });
+
+        monitorTimeout();
     }
 } // namespace io

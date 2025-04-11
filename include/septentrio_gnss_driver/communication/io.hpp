@@ -293,16 +293,13 @@ namespace io {
                 boost::system::error_code ec = connectInternal(endpoints);
                 while (node_->ok() && ec)
                 {
-                    node_->log(log_level::ERROR,
-                               "TCP connection to " +
-                                   endpoints.begin()
-                                       ->endpoint()
-                                       .address()
-                                       .to_string() +
-                                   " on port " +
-                                   std::to_string(
-                                       endpoints.begin()->endpoint().port()) +
-                                   " failed: " + ec.message() + ". Retrying ...");
+                    node_->log(
+                        log_level::ERROR,
+                        "TCP connection to " +
+                            endpoints.begin()->endpoint().address().to_string() +
+                            " on port " +
+                            std::to_string(endpoints.begin()->endpoint().port()) +
+                            " failed: " + ec.message() + ". Retrying ...");
                     using namespace std::chrono_literals;
                     std::this_thread::sleep_for(1s);
                     ec = connectInternal(endpoints);
@@ -337,8 +334,12 @@ namespace io {
             boost::asio::async_connect(*stream_, endpoints,
                                        boost::lambda::var(ec) = boost::lambda::_1);
             do
+            {
                 ioContext_->run_one();
-            while (node_->ok() && (ec == boost::asio::error::would_block));
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(100ms);
+
+            } while (node_->ok() && (ec == boost::asio::error::would_block));
             return ec;
         }
 
