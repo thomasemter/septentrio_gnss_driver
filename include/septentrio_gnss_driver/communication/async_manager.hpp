@@ -239,7 +239,11 @@ namespace io {
     {
         if constexpr (std::is_same<TcpIo, IoType>::value)
         {
-            timer_.expires_after(std::chrono::seconds(100));
+            thread_local auto timeout = std::chrono::milliseconds(
+                std::max(node_->settings()->polling_period_pvt,
+                         node_->settings()->polling_period_rest) +
+                10000);
+            timer_.expires_after(timeout);
             timer_.async_wait([this](const boost::system::error_code& error) {
                 if (!error)
                 {
