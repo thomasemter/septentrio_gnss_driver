@@ -214,8 +214,27 @@ elseif(ament_cmake_FOUND)
     rosidl_get_typesupport_target(
     cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
     target_link_libraries(${library_name} "${cpp_typesupport_target}")
-    target_compile_definitions(${library_name} PUBLIC ROS2_VER_N250)
+    target_compile_definitions(${library_name} 
+      PUBLIC ROS2_VER_N250
+      INTERFACE ROS2_VER_N250
+    )
   endif()
+
+  ament_export_dependencies(${library_name}
+    rclcpp
+    rclcpp_components
+    rosidl_default_runtime
+    diagnostic_msgs
+    nmea_msgs
+    sensor_msgs
+    geometry_msgs
+    gps_msgs
+    nav_msgs
+    tf2
+    tf2_eigen
+    tf2_geometry_msgs
+    tf2_ros
+  )
 
   ## executable
   ament_auto_add_executable(${executable_name}
