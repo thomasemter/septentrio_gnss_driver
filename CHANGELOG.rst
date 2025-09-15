@@ -2,6 +2,13 @@
 Changelog for package septentrio_gnss_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.6 (upcoming)
+------------------
+* Fixes
+    * Reset of settings on shutdown
+    * GBAS status of NavSatFix
+* Contributors: Thomas Emter, Tibor Dome, septentrio-users
+
 1.4.5 (2025-08-27)
 ------------------
 * Fixes
