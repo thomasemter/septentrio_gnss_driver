@@ -111,7 +111,10 @@ namespace io {
             {
                 if (!ntrip.id.empty() && !ntrip.keep_open)
                 {
-                    send("snts, " + ntrip.id + ", off \x0D");
+                    std::stringstream ss;
+                    ss << "snts, " << ntrip.id << ", off, 0.0.0.0, "
+                       << "0, , , off, " << " v2, off \x0D";
+                    send(ss.str());
                 }
             }
             for (auto ip_server : settings_->rtk.ip_server)
@@ -449,8 +452,6 @@ namespace io {
             {
                 if (!ntrip.id.empty())
                 {
-                    // First disable any existing NTRIP connection on NTR1
-                    send("snts, " + ntrip.id + ", off \x0D");
                     {
                         std::stringstream ss;
                         ss << "snts, " << ntrip.id << ", Client, " << ntrip.caster
