@@ -1370,32 +1370,32 @@ namespace io {
         }
         case evDGPS:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evRTKFixed:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evRTKFloat:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evMovingBaseRTKFixed:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evMovingBaseRTKFloat:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evPPP:
         {
-            msg.status.status = NavSatStatusMsg::STATUS_FIX;
+            msg.status.status = NavSatStatusMsg::STATUS_GBAS_FIX;
             break;
         }
         case evSBAS:
