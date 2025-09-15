@@ -72,9 +72,7 @@ namespace io {
 
     CommunicationCore::~CommunicationCore()
     {
-        telegramHandler_.clearSemaphores();
-
-        resetSettings();
+        node_->log(log_level::DEBUG, "Shutting down CommunicationCore.");
 
         running_ = false;
         auto telegram = std::make_shared<Telegram>();
@@ -82,12 +80,21 @@ namespace io {
         processingThread_.join();
     }
 
-    void CommunicationCore::close() { manager_->close(); }
+    void CommunicationCore::close()
+    {
+        telegramHandler_.clearSemaphores();
+
+        resetSettings();
+
+        manager_->close();
+    }
 
     void CommunicationCore::resetSettings()
     {
         if (!manager_->connected())
+        {
             return;
+        }
         if (settings_->configure_rx && !settings_->read_from_sbf_log &&
             !settings_->read_from_pcap)
         {

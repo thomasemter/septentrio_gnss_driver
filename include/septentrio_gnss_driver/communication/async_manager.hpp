@@ -97,7 +97,7 @@ namespace io {
         virtual void close() = 0;
         //! Sends commands to the receiver
         virtual void send(const std::string& cmd) = 0;
-        bool connected() { return false; };
+        virtual bool connected() = 0;
     };
 
     /**
