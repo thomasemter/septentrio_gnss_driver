@@ -112,8 +112,8 @@ namespace io {
                 if (!ntrip.id.empty() && !ntrip.keep_open)
                 {
                     std::stringstream ss;
-                    ss << "snts, " << ntrip.id << ", off, 0.0.0.0, "
-                       << "0, , , off, " << " v2, off \x0D";
+                    ss << "snts, " << ntrip.id << ", off,  \"\", "
+                       << "0,  \"\",  \"\", off, " << " v2, off \x0D";
                     send(ss.str());
                 }
             }
