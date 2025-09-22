@@ -100,9 +100,7 @@ namespace io {
         {
             resetMainConnection();
             send("sdio, " + mainConnectionPort_ + ", auto, none\x0D");
-            // Turning off all current SBF/NMEA output
-            send("sso, all, none, none, off \x0D");
-            send("sno, all, none, none, off \x0D");
+
             if ((settings_->udp_port != 0) && (!settings_->udp_ip_server.empty()))
             {
                 send("siss, " + settings_->udp_ip_server + ",  0\x0D");
