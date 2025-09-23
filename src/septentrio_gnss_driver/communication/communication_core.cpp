@@ -167,6 +167,13 @@ namespace io {
                     send(ss.str());
                 }
             }
+            for (auto stream : streamsToStop_)
+            {
+                std::stringstream ss;
+                ss << "sno, Stream" << std::to_string(stream)
+                   << ", none, none, off \x0D";
+                send(ss.str());
+            }
 
             if (!settings_->login_user.empty() && !settings_->login_password.empty())
                 send("logout \x0D");
@@ -500,6 +507,8 @@ namespace io {
                         std::stringstream ss;
                         ss << "sno, Stream" << std::to_string(stream) << ", "
                            << ip_server.id << ", GGA, " << rate << " \x0D";
+                        if (!ip_server.keep_open)
+                            streamsToStop_.push_back(stream);
                         ++stream;
                         send(ss.str());
                     }
@@ -527,6 +536,8 @@ namespace io {
                         std::stringstream ss;
                         ss << "sno, Stream" << std::to_string(stream) << ", "
                            << serial.port << ", GGA, " << rate << " \x0D";
+                        if (!serial.keep_open)
+                            streamsToStop_.push_back(stream);
                         ++stream;
                         send(ss.str());
                     }
