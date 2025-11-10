@@ -85,7 +85,8 @@ namespace io {
                     node_->setIsIns();
                 }
 
-                if (block_in_string.find("Heading") != std::string::npos)
+                if ((block_in_string.find("Heading") != std::string::npos) ||
+                    (block_in_string.find("Main+Aux1") != std::string::npos))
                 {
                     node_->setHasHeading();
                 }
