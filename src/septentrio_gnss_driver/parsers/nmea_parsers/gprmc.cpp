@@ -59,7 +59,7 @@ GprmcMsg GprmcParser::parseASCII(const NMEASentence& sentence,
                                  Timestamp time_obj) noexcept(false)
 {
 
-    // Checking the length first, it should be between 13 and 14 elements
+    // Checking the length first, it should be between 13 and 15 elements
     const size_t LEN_MIN = 13;
     const size_t LEN_MAX = 15;
 
