@@ -2634,8 +2634,6 @@ namespace io {
                 node_->log(log_level::ERROR, "parse error in ReceiverSetup");
                 break;
             }
-            node_->log(log_level::DEBUG,
-                       "receiver setup firmware: " + last_receiversetup_.rx_version);
 
             static const int32_t ins_major = 1;
             static const int32_t ins_minor = 4;
@@ -2643,6 +2641,9 @@ namespace io {
             static const int32_t gnss_major = 4;
             static const int32_t gnss_minor = 12;
             static const int32_t gnss_patch = 1;
+            static const int32_t gnss_g5_major = 1;
+            static const int32_t gnss_g5_minor = 0;
+            static const int32_t gnss_g5_patch = 1;
             boost::tokenizer<> tok(last_receiversetup_.rx_version);
             boost::tokenizer<>::iterator it = tok.begin();
             std::vector<int32_t> major_minor_patch;
@@ -2679,21 +2680,51 @@ namespace io {
                         node_->setImprovedVsmHandling();
                 } else if (settings_->septentrio_receiver_type == "gnss")
                 {
-                    if ((major_minor_patch[0] < gnss_major) ||
-                        ((major_minor_patch[0] == gnss_major) &&
-                         (major_minor_patch[1] < gnss_minor)) ||
-                        ((major_minor_patch[0] == gnss_major) &&
-                         (major_minor_patch[1] == gnss_minor) &&
-                         (major_minor_patch[2] < gnss_patch)))
+                    if ((major_minor_patch[0] < 4))
                     {
-                        node_->log(
-                            log_level::INFO,
-                            "GNSS receiver has firmware version: " +
-                                last_receiversetup_.rx_version +
-                                ", which may not support all features. Please update to at least " +
-                                std::to_string(gnss_major) + "." +
-                                std::to_string(gnss_minor) + "." +
-                                std::to_string(gnss_patch) + " or consult README.");
+                        if ((major_minor_patch[0] == 1) &&
+                            (major_minor_patch[0] == 0) &&
+                            (major_minor_patch[0] == 0))
+                        {
+                            node_->log(
+                                log_level::INFO,
+                                "GNSS G5 receiver has firmware version: 1.0.0, it must at least be updated to version 1.0.1!");
+                        } else if ((major_minor_patch[0] < gnss_g5_major) ||
+                                   ((major_minor_patch[0] == gnss_g5_major) &&
+                                    (major_minor_patch[1] < gnss_g5_minor)) ||
+                                   ((major_minor_patch[0] == gnss_g5_major) &&
+                                    (major_minor_patch[1] == gnss_g5_minor) &&
+                                    (major_minor_patch[2] < gnss_g5_patch)))
+                        {
+                            node_->log(
+                                log_level::INFO,
+                                "GNSS G5 receiver has firmware version: " +
+                                    last_receiversetup_.rx_version +
+                                    ", which may not support all features. Please update to at least " +
+                                    std::to_string(gnss_major) + "." +
+                                    std::to_string(gnss_minor) + "." +
+                                    std::to_string(gnss_patch) +
+                                    " or consult README.");
+                        }
+                    } else
+                    {
+                        if ((major_minor_patch[0] < gnss_major) ||
+                            ((major_minor_patch[0] == gnss_major) &&
+                             (major_minor_patch[1] < gnss_minor)) ||
+                            ((major_minor_patch[0] == gnss_major) &&
+                             (major_minor_patch[1] == gnss_minor) &&
+                             (major_minor_patch[2] < gnss_patch)))
+                        {
+                            node_->log(
+                                log_level::INFO,
+                                "GNSS receiver has firmware version: " +
+                                    last_receiversetup_.rx_version +
+                                    ", which may not support all features. Please update to at least " +
+                                    std::to_string(gnss_major) + "." +
+                                    std::to_string(gnss_minor) + "." +
+                                    std::to_string(gnss_patch) +
+                                    " or consult README.");
+                        }
                     }
                 }
             }

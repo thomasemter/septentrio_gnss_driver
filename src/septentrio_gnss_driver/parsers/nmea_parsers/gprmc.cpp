@@ -61,7 +61,7 @@ GprmcMsg GprmcParser::parseASCII(const NMEASentence& sentence,
 
     // Checking the length first, it should be between 13 and 14 elements
     const size_t LEN_MIN = 13;
-    const size_t LEN_MAX = 14;
+    const size_t LEN_MAX = 15;
 
     if (sentence.get_body().size() > LEN_MAX || sentence.get_body().size() < LEN_MIN)
     {
