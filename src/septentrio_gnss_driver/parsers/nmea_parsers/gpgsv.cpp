@@ -52,7 +52,7 @@ const std::string GpgsvParser::getMessageID() const
  */
 GpgsvMsg GpgsvParser::parseASCII(const NMEASentence& sentence,
                                  const std::string& frame_id, bool /*use_gnss_time*/,
-                                 Timestamp /*time_obj*/) noexcept(false)
+                                 Timestamp time_obj) noexcept(false)
 {
 
     const size_t MIN_LENGTH = 4;
@@ -65,6 +65,7 @@ GpgsvMsg GpgsvParser::parseASCII(const NMEASentence& sentence,
         throw ParseException(error.str());
     }
     GpgsvMsg msg;
+    msg.header.stamp = timestampToRos(time_obj);
     msg.header.frame_id = frame_id;
     msg.message_id = sentence.get_body()[0];
     if (!parsing_utilities::parseUInt8(sentence.get_body()[1], msg.n_msgs))

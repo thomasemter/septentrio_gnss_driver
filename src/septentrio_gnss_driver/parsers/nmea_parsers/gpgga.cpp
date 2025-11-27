@@ -67,43 +67,39 @@ GpggaMsg GpggaParser::parseASCII(const NMEASentence& sentence,
     }
 
     GpggaMsg msg;
+    msg.header.stamp = timestampToRos(time_obj);
     msg.header.frame_id = frame_id;
 
     msg.message_id = sentence.get_body()[0];
 
-    if (sentence.get_body()[1].empty() || sentence.get_body()[1] == "0")
+    if (!use_gnss_time || sentence.get_body()[1].empty() ||
+        sentence.get_body()[1] == "0")
     {
-        msg.utc_seconds = 0;
+        msg.header.stamp = timestampToRos(time_obj);
     } else
     {
         double utc_double;
         if (string_utilities::toDouble(sentence.get_body()[1], utc_double))
         {
-            if (use_gnss_time)
-            {
-                // ROS_DEBUG("utc_double is %f", (float) utc_double);
-                msg.utc_seconds =
-                    parsing_utilities::convertUTCDoubleToSeconds(utc_double);
+            // ROS_DEBUG("utc_double is %f", (float) utc_double);
+            msg.utc_seconds =
+                parsing_utilities::convertUTCDoubleToSeconds(utc_double);
 
-                // The Header's Unix Epoch time stamp
-                time_t unix_time_seconds =
-                    parsing_utilities::convertUTCtoUnix(utc_double);
-                // The following assumes that there are two digits after the decimal
-                // point in utc_double, i.e. in the NMEA UTC time.
-                Timestamp unix_time_nanoseconds =
-                    unix_time_seconds * 1000000000 +
-                    (static_cast<Timestamp>(utc_double * 100) % 100) * 10000;
-                msg.header.stamp = timestampToRos(unix_time_nanoseconds);
-            } else
-            {
-                msg.header.stamp = timestampToRos(time_obj);
-            }
+            // The Header's Unix Epoch time stamp
+            time_t unix_time_seconds =
+                parsing_utilities::convertUTCtoUnix(utc_double);
+            // The following assumes that there are two digits after the
+            // decimal point in utc_double, i.e. in the NMEA UTC time.
+            Timestamp unix_time_nanoseconds =
+                unix_time_seconds * 1000000000 +
+                (static_cast<Timestamp>(utc_double * 100) % 100) * 10000;
+            msg.header.stamp = timestampToRos(unix_time_nanoseconds);
         } else
         {
             throw ParseException(
-                "Error parsing UTC seconds in GPGGA"); // E.g. if one of the fields
-                                                       // of the NMEA UTC string is
-                                                       // empty
+                "Error parsing UTC seconds in GPGGA"); // E.g. if one of the
+                                                       // fields of the NMEA UTC
+                                                       // string is empty
         }
     }
 
