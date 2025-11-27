@@ -7,6 +7,9 @@ Changelog for package septentrio_gnss_driver
 * Fixes
     * Reset of settings on shutdown
     * GBAS status of NavSatFix
+* Improvements
+    * Change timestamp handling of NMEA messages.
+    * Adapt firmware check to include mosaic G5.
 * Contributors: Khuzema Darugar, Thomas Emter, Tibor Dome, septentrio-users
 
 1.4.5 (2025-08-27)
