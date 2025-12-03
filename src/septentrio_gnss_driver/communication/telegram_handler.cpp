@@ -132,7 +132,7 @@ namespace io {
             {
                 node_->log(
                     log_level::WARN,
-                    "Rx does not support PTP server clock. GNSS needs firmare >= 4.14., INS does not support it yet.");
+                    "Rx does not support PTP server clock. GNSS needs firmware >= 4.14., INS does not support it yet.");
             } else
             {
                 node_->log(

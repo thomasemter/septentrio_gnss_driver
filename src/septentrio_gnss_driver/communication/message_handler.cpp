@@ -2639,8 +2639,8 @@ namespace io {
             static const int32_t ins_minor = 4;
             static const int32_t ins_patch = 0;
             static const int32_t gnss_major = 4;
-            static const int32_t gnss_minor = 12;
-            static const int32_t gnss_patch = 1;
+            static const int32_t gnss_minor = 14;
+            static const int32_t gnss_patch = 0;
             static const int32_t gnss_g5_major = 1;
             static const int32_t gnss_g5_minor = 0;
             static const int32_t gnss_g5_patch = 1;
@@ -2669,13 +2669,14 @@ namespace io {
                          (major_minor_patch[2] < ins_patch)))
                     {
                         node_->log(
-                            log_level::INFO,
+                            log_level::WARN,
                             "INS receiver has firmware version: " +
                                 last_receiversetup_.rx_version +
                                 ", which does not support all features. Please update to at least " +
                                 std::to_string(ins_major) + "." +
                                 std::to_string(ins_minor) + "." +
-                                std::to_string(ins_patch) + " or consult README.");
+                                std::to_string(ins_patch) + " or consult README.",
+                            true);
                     } else
                         node_->setImprovedVsmHandling();
                 } else if (settings_->septentrio_receiver_type == "gnss")
@@ -2687,7 +2688,7 @@ namespace io {
                             (major_minor_patch[0] == 0))
                         {
                             node_->log(
-                                log_level::INFO,
+                                log_level::FATAL,
                                 "GNSS G5 receiver has firmware version: 1.0.0, it must at least be updated to version 1.0.1!");
                         } else if ((major_minor_patch[0] < gnss_g5_major) ||
                                    ((major_minor_patch[0] == gnss_g5_major) &&
@@ -2697,14 +2698,15 @@ namespace io {
                                     (major_minor_patch[2] < gnss_g5_patch)))
                         {
                             node_->log(
-                                log_level::INFO,
+                                log_level::WARN,
                                 "GNSS G5 receiver has firmware version: " +
                                     last_receiversetup_.rx_version +
                                     ", which may not support all features. Please update to at least " +
                                     std::to_string(gnss_major) + "." +
                                     std::to_string(gnss_minor) + "." +
                                     std::to_string(gnss_patch) +
-                                    " or consult README.");
+                                    " or consult README.",
+                                true);
                         }
                     } else
                     {
@@ -2716,14 +2718,15 @@ namespace io {
                              (major_minor_patch[2] < gnss_patch)))
                         {
                             node_->log(
-                                log_level::INFO,
+                                log_level::WARN,
                                 "GNSS receiver has firmware version: " +
                                     last_receiversetup_.rx_version +
                                     ", which may not support all features. Please update to at least " +
                                     std::to_string(gnss_major) + "." +
                                     std::to_string(gnss_minor) + "." +
                                     std::to_string(gnss_patch) +
-                                    " or consult README.");
+                                    " or consult README.",
+                                true);
                         }
                     }
                 }
