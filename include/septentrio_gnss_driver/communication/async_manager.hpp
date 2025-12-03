@@ -385,13 +385,8 @@ namespace io {
                                 }
                                 default:
                                 {
-                                    std::stringstream ss;
-                                    ss << std::hex << currByte;
-                                    node_->log(
-                                        log_level::DEBUG,
-                                        "AsyncManager sync byte 2 read fault, should never come here.. Received byte was " +
-                                            ss.str());
-                                    resync();
+                                    telegram_->type = telegram_type::UNKNOWN;
+                                    readUnknown();
                                     break;
                                 }
                                 }
@@ -446,13 +441,8 @@ namespace io {
                                 }
                                 default:
                                 {
-                                    std::stringstream ss;
-                                    ss << std::hex << currByte;
-                                    node_->log(
-                                        log_level::DEBUG,
-                                        "AsyncManager sync byte 3 read fault, should never come here. Received byte was " +
-                                            ss.str());
-                                    resync();
+                                    telegram_->type = telegram_type::UNKNOWN;
+                                    readUnknown();
                                     break;
                                 }
                                 }
@@ -460,10 +450,8 @@ namespace io {
                             }
                             default:
                             {
-                                node_->log(
-                                    log_level::DEBUG,
-                                    "AsyncManager sync read fault, unknown sync byte 2 found.");
-                                resync();
+                                telegram_->type = telegram_type::UNKNOWN;
+                                readUnknown();
                                 break;
                             }
                             }
@@ -620,6 +608,7 @@ namespace io {
                                 "AsyncManager string read fault, sync 1 found: " +
                                     std::string(telegram_->message.begin(),
                                                 telegram_->message.end()));
+
                             telegram_ = std::make_shared<Telegram>();
                             telegram_->message[0] = buf_[0];
                             telegram_->stamp = node_->getTime();
