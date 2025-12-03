@@ -53,9 +53,15 @@ static const uint8_t SBF_SYNC_BYTE_2 = 0x40;
 static const uint8_t NMEA_SYNC_BYTE_2 = 0x47;
 //! 0x50 is ASCII for P - 3rd byte to indicate NMEA-type ASCII message
 static const uint8_t NMEA_SYNC_BYTE_3 = 0x50;
+//! 0x4E is ASCII for N - 3rd byte to indicate NMEA-type ASCII message
+static const uint8_t NMEA_SYNC_BYTE_3a = 0x4E;
+//! 0x41 is ASCII for A - 3rd byte to indicate NMEA-type ASCII message
+static const uint8_t NMEA_SYNC_BYTE_3b = 0x41;
+//! 0x42 is ASCII for B - 3rd byte to indicate NMEA-type ASCII message
+static const uint8_t NMEA_SYNC_BYTE_3c = 0x42;
 //! 0x49 is ASCII for I - 2nd byte to indicate INS NMEA-type ASCII message
 static const uint8_t NMEA_INS_SYNC_BYTE_2 = 0x49;
-//! 0x4E is ASCII for N - 3rd byte to indicate NMEA-type ASCII message
+//! 0x4E is ASCII for N - 3rd byte to indicate INS NMEA-type ASCII message
 static const uint8_t NMEA_INS_SYNC_BYTE_3 = 0x4E;
 //! 0x52 is ASCII for R (for "Response") - 2nd byte in each response from the Rx
 static const uint8_t RESPONSE_SYNC_BYTE_2 = 0x52;

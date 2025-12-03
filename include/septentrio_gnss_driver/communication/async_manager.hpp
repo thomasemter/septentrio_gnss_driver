@@ -394,57 +394,22 @@ namespace io {
                             }
                             case 2:
                             {
-                                switch (currByte)
+                                if ((currByte == NMEA_SYNC_BYTE_3) ||
+                                    (currByte == NMEA_SYNC_BYTE_3a) ||
+                                    (currByte == NMEA_SYNC_BYTE_3b) ||
+                                    (currByte == NMEA_SYNC_BYTE_3c) ||
+                                    (currByte == NMEA_INS_SYNC_BYTE_3) ||
+                                    (currByte == RESPONSE_SYNC_BYTE_3) ||
+                                    (currByte == RESPONSE_SYNC_BYTE_3a))
+                                    readString();
+                                else if (ERROR_SYNC_BYTE_3)
                                 {
-                                case NMEA_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::NMEA)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case NMEA_INS_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::NMEA_INS)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case RESPONSE_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case RESPONSE_SYNC_BYTE_3a:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case ERROR_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                    {
-                                        telegram_->type =
-                                            telegram_type::ERROR_RESPONSE;
-                                        readString();
-                                    } else
-                                        resync();
-                                    break;
-                                }
-                                default:
+                                    telegram_->type = telegram_type::ERROR_RESPONSE;
+                                    readString();
+                                } else
                                 {
                                     telegram_->type = telegram_type::UNKNOWN;
                                     readUnknown();
-                                    break;
-                                }
                                 }
                                 break;
                             }
