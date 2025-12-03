@@ -47,6 +47,10 @@
  * computations.
  */
 
+using parsing_utilities::convertAutoCovariance;
+using parsing_utilities::convertAutoCovarianceNaN;
+using parsing_utilities::convertCovariance;
+using parsing_utilities::convertCovarianceNaN;
 using parsing_utilities::convertEulerToQuaternionMsg;
 using parsing_utilities::deg2rad;
 using parsing_utilities::deg2radSq;
@@ -80,9 +84,12 @@ namespace io {
             if ((last_insnavgeod_.sb_list & 1) != 0)
             {
                 // Pos autocov
-                msg.pose.covariance[0] = square(last_insnavgeod_.longitude_std_dev);
-                msg.pose.covariance[7] = square(last_insnavgeod_.latitude_std_dev);
-                msg.pose.covariance[14] = square(last_insnavgeod_.height_std_dev);
+                msg.pose.covariance[0] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.longitude_std_dev));
+                msg.pose.covariance[7] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.latitude_std_dev));
+                msg.pose.covariance[14] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.height_std_dev));
             } else
             {
                 msg.pose.covariance[0] = -1.0;
@@ -113,12 +120,12 @@ namespace io {
             if ((last_insnavgeod_.sb_list & 4) != 0)
             {
                 // Attitude autocov
-                msg.pose.covariance[21] = parsing_utilities::convertAutoCovariance(
-                    last_insnavgeod_.roll_std_dev);
-                msg.pose.covariance[28] = parsing_utilities::convertAutoCovariance(
-                    last_insnavgeod_.pitch_std_dev);
-                msg.pose.covariance[35] = parsing_utilities::convertAutoCovariance(
-                    last_insnavgeod_.heading_std_dev);
+                msg.pose.covariance[21] =
+                    convertAutoCovariance(last_insnavgeod_.roll_std_dev);
+                msg.pose.covariance[28] =
+                    convertAutoCovariance(last_insnavgeod_.pitch_std_dev);
+                msg.pose.covariance[35] =
+                    convertAutoCovariance(last_insnavgeod_.heading_std_dev);
 
             } else
             {
@@ -129,29 +136,35 @@ namespace io {
             if ((last_insnavgeod_.sb_list & 32) != 0)
             {
                 // Pos cov
-                msg.pose.covariance[1] = last_insnavgeod_.latitude_longitude_cov;
-                msg.pose.covariance[2] = last_insnavgeod_.longitude_height_cov;
-                msg.pose.covariance[6] = last_insnavgeod_.latitude_longitude_cov;
-                msg.pose.covariance[8] = last_insnavgeod_.latitude_height_cov;
-                msg.pose.covariance[12] = last_insnavgeod_.longitude_height_cov;
-                msg.pose.covariance[13] = last_insnavgeod_.latitude_height_cov;
+                msg.pose.covariance[1] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.pose.covariance[2] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.pose.covariance[6] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.pose.covariance[8] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
+                msg.pose.covariance[12] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.pose.covariance[13] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
             }
             if ((last_insnavgeod_.sb_list & 64) != 0)
             {
                 // Attitude cov
-                msg.pose.covariance[22] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.pitch_roll_cov);
-                msg.pose.covariance[23] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.heading_roll_cov);
-                msg.pose.covariance[27] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.pitch_roll_cov);
+                msg.pose.covariance[22] =
+                    convertCovariance(last_insnavgeod_.pitch_roll_cov);
+                msg.pose.covariance[23] =
+                    convertCovariance(last_insnavgeod_.heading_roll_cov);
+                msg.pose.covariance[27] =
+                    convertCovariance(last_insnavgeod_.pitch_roll_cov);
 
-                msg.pose.covariance[29] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.heading_pitch_cov);
-                msg.pose.covariance[33] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.heading_roll_cov);
-                msg.pose.covariance[34] = parsing_utilities::convertCovariance(
-                    last_insnavgeod_.heading_pitch_cov);
+                msg.pose.covariance[29] =
+                    convertCovariance(last_insnavgeod_.heading_pitch_cov);
+                msg.pose.covariance[33] =
+                    convertCovariance(last_insnavgeod_.heading_roll_cov);
+                msg.pose.covariance[34] =
+                    convertCovariance(last_insnavgeod_.heading_pitch_cov);
             }
         } else
         {
@@ -180,33 +193,42 @@ namespace io {
             msg.pose.pose.position.y = rad2deg(last_pvtgeodetic_.latitude);
             msg.pose.pose.position.z = last_pvtgeodetic_.height;
             // Filling in the covariance data in row-major order
-            msg.pose.covariance[0] = last_poscovgeodetic_.cov_lonlon;
-            msg.pose.covariance[1] = last_poscovgeodetic_.cov_latlon;
-            msg.pose.covariance[2] = last_poscovgeodetic_.cov_lonhgt;
-            msg.pose.covariance[6] = last_poscovgeodetic_.cov_latlon;
-            msg.pose.covariance[7] = last_poscovgeodetic_.cov_latlat;
-            msg.pose.covariance[8] = last_poscovgeodetic_.cov_lathgt;
-            msg.pose.covariance[12] = last_poscovgeodetic_.cov_lonhgt;
-            msg.pose.covariance[13] = last_poscovgeodetic_.cov_lathgt;
-            msg.pose.covariance[14] = last_poscovgeodetic_.cov_hgthgt;
-            msg.pose.covariance[21] = parsing_utilities::convertAutoCovariance(
-                last_attcoveuler_.cov_rollroll);
-            msg.pose.covariance[22] = parsing_utilities::convertCovariance(
-                last_attcoveuler_.cov_pitchroll);
+            msg.pose.covariance[0] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lonlon);
+            msg.pose.covariance[1] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.pose.covariance[2] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.pose.covariance[6] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.pose.covariance[7] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_latlat);
+            msg.pose.covariance[8] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.pose.covariance[12] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.pose.covariance[13] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.pose.covariance[14] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_hgthgt);
+            msg.pose.covariance[21] =
+                convertAutoCovariance(last_attcoveuler_.cov_rollroll);
+            msg.pose.covariance[22] =
+                convertCovariance(last_attcoveuler_.cov_pitchroll);
             msg.pose.covariance[23] =
-                parsing_utilities::convertCovariance(last_attcoveuler_.cov_headroll);
-            msg.pose.covariance[27] = parsing_utilities::convertCovariance(
-                last_attcoveuler_.cov_pitchroll);
-            msg.pose.covariance[28] = parsing_utilities::convertAutoCovariance(
-                last_attcoveuler_.cov_pitchpitch);
-            msg.pose.covariance[29] = parsing_utilities::convertCovariance(
-                last_attcoveuler_.cov_headpitch);
+                convertCovariance(last_attcoveuler_.cov_headroll);
+            msg.pose.covariance[27] =
+                convertCovariance(last_attcoveuler_.cov_pitchroll);
+            msg.pose.covariance[28] =
+                convertAutoCovariance(last_attcoveuler_.cov_pitchpitch);
+            msg.pose.covariance[29] =
+                convertCovariance(last_attcoveuler_.cov_headpitch);
             msg.pose.covariance[33] =
-                parsing_utilities::convertCovariance(last_attcoveuler_.cov_headroll);
-            msg.pose.covariance[34] = parsing_utilities::convertCovariance(
-                last_attcoveuler_.cov_headpitch);
-            msg.pose.covariance[35] = parsing_utilities::convertAutoCovariance(
-                last_attcoveuler_.cov_headhead);
+                convertCovariance(last_attcoveuler_.cov_headroll);
+            msg.pose.covariance[34] =
+                convertCovariance(last_attcoveuler_.cov_headpitch);
+            msg.pose.covariance[35] =
+                convertAutoCovariance(last_attcoveuler_.cov_headhead);
         }
         publish<PoseWithCovarianceStampedMsg>("pose", msg);
     };
@@ -623,37 +645,28 @@ namespace io {
                     validValue(last_insnavgeod_.heading_std_dev))
                 {
                     msg.orientation_covariance[0] =
-                        parsing_utilities::convertAutoCovariance(
-                            last_insnavgeod_.roll_std_dev);
+                        convertAutoCovariance(last_insnavgeod_.roll_std_dev);
                     msg.orientation_covariance[4] =
-                        parsing_utilities::convertAutoCovariance(
-                            last_insnavgeod_.pitch_std_dev);
+                        convertAutoCovariance(last_insnavgeod_.pitch_std_dev);
                     msg.orientation_covariance[8] =
-                        parsing_utilities::convertAutoCovariance(
-                            last_insnavgeod_.heading_std_dev);
+                        convertAutoCovariance(last_insnavgeod_.heading_std_dev);
 
                     if ((last_insnavgeod_.sb_list & 64) != 0)
                     {
                         // Attitude cov
                         msg.orientation_covariance[1] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.pitch_roll_cov);
+                            convertCovariance(last_insnavgeod_.pitch_roll_cov);
                         msg.orientation_covariance[2] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.heading_roll_cov);
+                            convertCovariance(last_insnavgeod_.heading_roll_cov);
                         msg.orientation_covariance[3] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.pitch_roll_cov);
+                            convertCovariance(last_insnavgeod_.pitch_roll_cov);
 
                         msg.orientation_covariance[5] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.heading_pitch_cov);
+                            convertCovariance(last_insnavgeod_.heading_pitch_cov);
                         msg.orientation_covariance[6] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.heading_roll_cov);
+                            convertCovariance(last_insnavgeod_.heading_roll_cov);
                         msg.orientation_covariance[7] =
-                            parsing_utilities::convertCovariance(
-                                last_insnavgeod_.heading_pitch_cov);
+                            convertCovariance(last_insnavgeod_.heading_pitch_cov);
                     }
                 } else
                 {
@@ -963,9 +976,12 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 1) != 0)
         {
             // Position autocovariance
-            P_pos(0, 0) = square(last_insnavgeod_.longitude_std_dev);
-            P_pos(1, 1) = square(last_insnavgeod_.latitude_std_dev);
-            P_pos(2, 2) = square(last_insnavgeod_.height_std_dev);
+            P_pos(0, 0) =
+                convertAutoCovarianceNaN(square(last_insnavgeod_.longitude_std_dev));
+            P_pos(1, 1) =
+                convertAutoCovarianceNaN(square(last_insnavgeod_.latitude_std_dev));
+            P_pos(2, 2) =
+                convertAutoCovarianceNaN(square(last_insnavgeod_.height_std_dev));
         }
 
         // Euler angles
@@ -996,12 +1012,12 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 4) != 0)
         {
             // Attitude autocovariance
-            msg.pose.covariance[21] = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.roll_std_dev);
-            msg.pose.covariance[28] = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.pitch_std_dev);
-            msg.pose.covariance[35] = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.heading_std_dev);
+            msg.pose.covariance[21] =
+                convertAutoCovariance(last_insnavgeod_.roll_std_dev);
+            msg.pose.covariance[28] =
+                convertAutoCovariance(last_insnavgeod_.pitch_std_dev);
+            msg.pose.covariance[35] =
+                convertAutoCovariance(last_insnavgeod_.heading_std_dev);
         } else
         {
             msg.pose.covariance[21] = -1.0;
@@ -1012,23 +1028,33 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 32) != 0)
         {
             // Position covariance
-            P_pos(0, 1) = last_insnavgeod_.latitude_longitude_cov;
-            P_pos(1, 0) = last_insnavgeod_.latitude_longitude_cov;
+            P_pos(0, 1) =
+                convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+            P_pos(1, 0) =
+                convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
 
             if (settings_->use_ros_axis_orientation)
             {
                 // (ENU)
-                P_pos(0, 2) = last_insnavgeod_.longitude_height_cov;
-                P_pos(1, 2) = last_insnavgeod_.latitude_height_cov;
-                P_pos(2, 0) = last_insnavgeod_.longitude_height_cov;
-                P_pos(2, 1) = last_insnavgeod_.latitude_height_cov;
+                P_pos(0, 2) =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                P_pos(1, 2) =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
+                P_pos(2, 0) =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                P_pos(2, 1) =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
             } else
             {
                 // (NED): down = -height
-                P_pos(0, 2) = -last_insnavgeod_.latitude_height_cov;
-                P_pos(1, 2) = -last_insnavgeod_.longitude_height_cov;
-                P_pos(2, 0) = -last_insnavgeod_.latitude_height_cov;
-                P_pos(2, 1) = -last_insnavgeod_.longitude_height_cov;
+                P_pos(0, 2) =
+                    convertCovarianceNaN(-last_insnavgeod_.latitude_height_cov);
+                P_pos(1, 2) =
+                    convertCovarianceNaN(-last_insnavgeod_.longitude_height_cov);
+                P_pos(2, 0) =
+                    convertCovarianceNaN(-last_insnavgeod_.latitude_height_cov);
+                P_pos(2, 1) =
+                    convertCovarianceNaN(-last_insnavgeod_.longitude_height_cov);
             }
         }
 
@@ -1057,19 +1083,19 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 64) != 0)
         {
             // Attitude covariancae
-            msg.pose.covariance[22] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.pitch_roll_cov);
-            msg.pose.covariance[23] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.heading_roll_cov);
-            msg.pose.covariance[27] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.pitch_roll_cov);
+            msg.pose.covariance[22] =
+                convertCovariance(last_insnavgeod_.pitch_roll_cov);
+            msg.pose.covariance[23] =
+                convertCovariance(last_insnavgeod_.heading_roll_cov);
+            msg.pose.covariance[27] =
+                convertCovariance(last_insnavgeod_.pitch_roll_cov);
 
-            msg.pose.covariance[29] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.heading_pitch_cov);
-            msg.pose.covariance[33] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.heading_roll_cov);
-            msg.pose.covariance[34] = parsing_utilities::convertCovariance(
-                last_insnavgeod_.heading_pitch_cov);
+            msg.pose.covariance[29] =
+                convertCovariance(last_insnavgeod_.heading_pitch_cov);
+            msg.pose.covariance[33] =
+                convertCovariance(last_insnavgeod_.heading_roll_cov);
+            msg.pose.covariance[34] =
+                convertCovariance(last_insnavgeod_.heading_pitch_cov);
         }
 
         assembleLocalizationMsgTwist(roll, pitch, yaw, msg);
@@ -1111,9 +1137,12 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 1) != 0)
         {
             // Position autocovariance
-            msg.pose.covariance[0] = square(last_insnavcart_.x_std_dev);
-            msg.pose.covariance[7] = square(last_insnavcart_.y_std_dev);
-            msg.pose.covariance[14] = square(last_insnavcart_.z_std_dev);
+            msg.pose.covariance[0] =
+                convertAutoCovarianceNaN(square(last_insnavcart_.x_std_dev));
+            msg.pose.covariance[7] =
+                convertAutoCovarianceNaN(square(last_insnavcart_.y_std_dev));
+            msg.pose.covariance[14] =
+                convertAutoCovarianceNaN(square(last_insnavcart_.z_std_dev));
         } else
         {
             msg.pose.covariance[0] = -1.0;
@@ -1123,12 +1152,12 @@ namespace io {
         if ((last_insnavcart_.sb_list & 32) != 0)
         {
             // Position covariance
-            msg.pose.covariance[1] = last_insnavcart_.xy_cov;
-            msg.pose.covariance[6] = last_insnavcart_.xy_cov;
-            msg.pose.covariance[2] = last_insnavcart_.xz_cov;
-            msg.pose.covariance[8] = last_insnavcart_.yz_cov;
-            msg.pose.covariance[12] = last_insnavcart_.xz_cov;
-            msg.pose.covariance[13] = last_insnavcart_.yz_cov;
+            msg.pose.covariance[1] = convertCovarianceNaN(last_insnavcart_.xy_cov);
+            msg.pose.covariance[6] = convertCovarianceNaN(last_insnavcart_.xy_cov);
+            msg.pose.covariance[2] = convertCovarianceNaN(last_insnavcart_.xz_cov);
+            msg.pose.covariance[8] = convertCovarianceNaN(last_insnavcart_.yz_cov);
+            msg.pose.covariance[12] = convertCovarianceNaN(last_insnavcart_.xz_cov);
+            msg.pose.covariance[13] = convertCovarianceNaN(last_insnavcart_.yz_cov);
         }
 
         // Euler angles
@@ -1168,12 +1197,12 @@ namespace io {
         if ((last_insnavgeod_.sb_list & 4) != 0)
         {
             // Attitude autocovariance
-            covAtt_local(0, 0) = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.roll_std_dev);
-            covAtt_local(1, 1) = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.pitch_std_dev);
-            covAtt_local(2, 2) = parsing_utilities::convertAutoCovariance(
-                last_insnavgeod_.heading_std_dev);
+            covAtt_local(0, 0) =
+                convertAutoCovariance(last_insnavgeod_.roll_std_dev);
+            covAtt_local(1, 1) =
+                convertAutoCovariance(last_insnavgeod_.pitch_std_dev);
+            covAtt_local(2, 2) =
+                convertAutoCovariance(last_insnavgeod_.heading_std_dev);
             covAttValid = !std::isnan(last_insnavgeod_.roll_std_dev) &&
                           !std::isnan(last_insnavgeod_.pitch_std_dev) &&
                           !std::isnan(last_insnavgeod_.heading_std_dev);
@@ -1190,18 +1219,18 @@ namespace io {
             if ((last_insnavcart_.sb_list & 64) != 0)
             {
                 // Attitude covariancae
-                covAtt_local(0, 1) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.pitch_roll_cov);
-                covAtt_local(0, 2) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.heading_roll_cov);
-                covAtt_local(1, 0) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.pitch_roll_cov);
-                covAtt_local(2, 1) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.heading_pitch_cov);
-                covAtt_local(2, 0) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.heading_roll_cov);
-                covAtt_local(1, 2) = parsing_utilities::convertCovariance(
-                    last_insnavcart_.heading_pitch_cov);
+                covAtt_local(0, 1) =
+                    convertCovariance(last_insnavcart_.pitch_roll_cov);
+                covAtt_local(0, 2) =
+                    convertCovariance(last_insnavcart_.heading_roll_cov);
+                covAtt_local(1, 0) =
+                    convertCovariance(last_insnavcart_.pitch_roll_cov);
+                covAtt_local(2, 1) =
+                    convertCovariance(last_insnavcart_.heading_pitch_cov);
+                covAtt_local(2, 0) =
+                    convertCovariance(last_insnavcart_.heading_roll_cov);
+                covAtt_local(1, 2) =
+                    convertCovariance(last_insnavcart_.heading_pitch_cov);
             }
 
             Eigen::Matrix3d R_local_ecef;
@@ -1467,15 +1496,24 @@ namespace io {
             msg.latitude = rad2deg(last_pvtgeodetic_.latitude);
             msg.longitude = rad2deg(last_pvtgeodetic_.longitude);
             msg.altitude = last_pvtgeodetic_.height;
-            msg.position_covariance[0] = last_poscovgeodetic_.cov_lonlon;
-            msg.position_covariance[1] = last_poscovgeodetic_.cov_latlon;
-            msg.position_covariance[2] = last_poscovgeodetic_.cov_lonhgt;
-            msg.position_covariance[3] = last_poscovgeodetic_.cov_latlon;
-            msg.position_covariance[4] = last_poscovgeodetic_.cov_latlat;
-            msg.position_covariance[5] = last_poscovgeodetic_.cov_lathgt;
-            msg.position_covariance[6] = last_poscovgeodetic_.cov_lonhgt;
-            msg.position_covariance[7] = last_poscovgeodetic_.cov_lathgt;
-            msg.position_covariance[8] = last_poscovgeodetic_.cov_hgthgt;
+            msg.position_covariance[0] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lonlon);
+            msg.position_covariance[1] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.position_covariance[2] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.position_covariance[3] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.position_covariance[4] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_latlat);
+            msg.position_covariance[5] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.position_covariance[6] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.position_covariance[7] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.position_covariance[8] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_hgthgt);
             msg.position_covariance_type = NavSatFixMsg::COVARIANCE_TYPE_KNOWN;
         } else if (settings_->septentrio_receiver_type == "ins")
         {
@@ -1520,20 +1558,27 @@ namespace io {
 
             if ((last_insnavgeod_.sb_list & 1) != 0)
             {
-                msg.position_covariance[0] =
-                    square(last_insnavgeod_.longitude_std_dev);
-                msg.position_covariance[4] =
-                    square(last_insnavgeod_.latitude_std_dev);
-                msg.position_covariance[8] = square(last_insnavgeod_.height_std_dev);
+                msg.position_covariance[0] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.longitude_std_dev));
+                msg.position_covariance[4] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.latitude_std_dev));
+                msg.position_covariance[8] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.height_std_dev));
             }
             if ((last_insnavgeod_.sb_list & 32) != 0)
             {
-                msg.position_covariance[1] = last_insnavgeod_.latitude_longitude_cov;
-                msg.position_covariance[2] = last_insnavgeod_.longitude_height_cov;
-                msg.position_covariance[3] = last_insnavgeod_.latitude_longitude_cov;
-                msg.position_covariance[5] = last_insnavgeod_.latitude_height_cov;
-                msg.position_covariance[6] = last_insnavgeod_.longitude_height_cov;
-                msg.position_covariance[7] = last_insnavgeod_.latitude_height_cov;
+                msg.position_covariance[1] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.position_covariance[2] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.position_covariance[3] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.position_covariance[5] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
+                msg.position_covariance[6] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.position_covariance[7] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
             }
             msg.position_covariance_type =
                 NavSatFixMsg::COVARIANCE_TYPE_DIAGONAL_KNOWN;
@@ -1895,15 +1940,24 @@ namespace io {
             msg.err_dip =
                 2 * std::sqrt(static_cast<double>(last_attcoveuler_.cov_headhead));
 
-            msg.position_covariance[0] = last_poscovgeodetic_.cov_lonlon;
-            msg.position_covariance[1] = last_poscovgeodetic_.cov_latlon;
-            msg.position_covariance[2] = last_poscovgeodetic_.cov_lonhgt;
-            msg.position_covariance[3] = last_poscovgeodetic_.cov_latlon;
-            msg.position_covariance[4] = last_poscovgeodetic_.cov_latlat;
-            msg.position_covariance[5] = last_poscovgeodetic_.cov_lathgt;
-            msg.position_covariance[6] = last_poscovgeodetic_.cov_lonhgt;
-            msg.position_covariance[7] = last_poscovgeodetic_.cov_lathgt;
-            msg.position_covariance[8] = last_poscovgeodetic_.cov_hgthgt;
+            msg.position_covariance[0] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_lonlon);
+            msg.position_covariance[1] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.position_covariance[2] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.position_covariance[3] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_latlon);
+            msg.position_covariance[4] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_latlat);
+            msg.position_covariance[5] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.position_covariance[6] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lonhgt);
+            msg.position_covariance[7] =
+                convertCovarianceNaN(last_poscovgeodetic_.cov_lathgt);
+            msg.position_covariance[8] =
+                convertAutoCovarianceNaN(last_poscovgeodetic_.cov_hgthgt);
             msg.position_covariance_type = NavSatFixMsg::COVARIANCE_TYPE_KNOWN;
         } else if (settings_->septentrio_receiver_type == "ins")
         {
@@ -2012,20 +2066,27 @@ namespace io {
             }
             if ((last_insnavgeod_.sb_list & 1) != 0)
             {
-                msg.position_covariance[0] =
-                    square(last_insnavgeod_.longitude_std_dev);
-                msg.position_covariance[4] =
-                    square(last_insnavgeod_.latitude_std_dev);
-                msg.position_covariance[8] = square(last_insnavgeod_.height_std_dev);
+                msg.position_covariance[0] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.longitude_std_dev));
+                msg.position_covariance[4] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.latitude_std_dev));
+                msg.position_covariance[8] = convertAutoCovarianceNaN(
+                    square(last_insnavgeod_.height_std_dev));
             }
             if ((last_insnavgeod_.sb_list & 32) != 0)
             {
-                msg.position_covariance[1] = last_insnavgeod_.latitude_longitude_cov;
-                msg.position_covariance[2] = last_insnavgeod_.longitude_height_cov;
-                msg.position_covariance[3] = last_insnavgeod_.latitude_longitude_cov;
-                msg.position_covariance[5] = last_insnavgeod_.latitude_height_cov;
-                msg.position_covariance[6] = last_insnavgeod_.longitude_height_cov;
-                msg.position_covariance[7] = last_insnavgeod_.latitude_height_cov;
+                msg.position_covariance[1] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.position_covariance[2] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.position_covariance[3] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_longitude_cov);
+                msg.position_covariance[5] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
+                msg.position_covariance[6] =
+                    convertCovarianceNaN(last_insnavgeod_.longitude_height_cov);
+                msg.position_covariance[7] =
+                    convertCovarianceNaN(last_insnavgeod_.latitude_height_cov);
             }
             msg.position_covariance_type =
                 NavSatFixMsg::COVARIANCE_TYPE_DIAGONAL_KNOWN;
