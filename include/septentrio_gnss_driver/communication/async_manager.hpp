@@ -615,12 +615,14 @@ namespace io {
                         {
                         case SYNC_BYTE_1:
                         {
+                            node_->log(
+                                log_level::DEBUG,
+                                "AsyncManager string read fault, sync 1 found: " +
+                                    std::string(telegram_->message.begin(),
+                                                telegram_->message.end()));
                             telegram_ = std::make_shared<Telegram>();
                             telegram_->message[0] = buf_[0];
                             telegram_->stamp = node_->getTime();
-                            node_->log(
-                                log_level::DEBUG,
-                                "AsyncManager string read fault, sync 1 found.");
                             readSync<1>();
                             break;
                         }
