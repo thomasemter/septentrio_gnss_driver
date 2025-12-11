@@ -28,6 +28,8 @@ else ()
     set(libpcap_FOUND TRUE)
 endif ()
 
+find_package(ros_environment REQUIRED)
+
 find_package(ament_cmake QUIET)
 find_package(catkin QUIET)
 
