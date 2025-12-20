@@ -2,7 +2,7 @@
 Changelog for package septentrio_gnss_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.4.6 (upcoming)
+Forthcoming
 ------------------
 * Fixes
     * Reset of settings on shutdown
@@ -11,6 +11,7 @@ Changelog for package septentrio_gnss_driver
 * Improvements
     * Change timestamp handling of NMEA messages.
     * Adapt firmware check to include mosaic G5.
+    * Add ros_environment as a build dependency.
 * Contributors: Khuzema Darugar, Martin Pecka, Thomas Emter, Tibor Dome, septentrio-users
 
 1.4.5 (2025-08-27)
