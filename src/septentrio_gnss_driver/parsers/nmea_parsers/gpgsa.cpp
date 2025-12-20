@@ -52,7 +52,7 @@ const std::string GpgsaParser::getMessageID() const
  */
 GpgsaMsg GpgsaParser::parseASCII(const NMEASentence& sentence,
                                  const std::string& frame_id, bool /*use_gnss_time*/,
-                                 Timestamp /*time_obj*/) noexcept(false)
+                                 Timestamp time_obj) noexcept(false)
 {
 
     // Checking the length first, it should be 19 elements
@@ -66,6 +66,7 @@ GpgsaMsg GpgsaParser::parseASCII(const NMEASentence& sentence,
     }
 
     GpgsaMsg msg;
+    msg.header.stamp = timestampToRos(time_obj);
     msg.header.frame_id = frame_id;
     msg.message_id = sentence.get_body()[0];
     msg.auto_manual_mode = sentence.get_body()[1];

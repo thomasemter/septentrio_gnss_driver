@@ -259,27 +259,54 @@ public:
      * @param[in] logLevel Log level
      * @param[in] s String to log
      */
-    void log(log_level::LogLevel logLevel, const std::string& s) const
+    void log(log_level::LogLevel logLevel, const std::string& s,
+             bool once = false) const
     {
-        switch (logLevel)
+        if (once)
         {
-        case log_level::DEBUG:
-            ROS_DEBUG_STREAM(ros::this_node::getName() << ": " << s);
-            break;
-        case log_level::INFO:
-            ROS_INFO_STREAM(ros::this_node::getName() << ": " << s);
-            break;
-        case log_level::WARN:
-            ROS_WARN_STREAM(ros::this_node::getName() << ": " << s);
-            break;
-        case log_level::ERROR:
-            ROS_ERROR_STREAM(ros::this_node::getName() << ": " << s);
-            break;
-        case log_level::FATAL:
-            ROS_FATAL_STREAM(ros::this_node::getName() << ": " << s);
-            break;
-        default:
-            break;
+            switch (logLevel)
+                switch (logLevel)
+                {
+                case log_level::DEBUG:
+                    ROS_DEBUG_STREAM_ONCE(ros::this_node::getName() << ": " << s);
+                    break;
+                case log_level::INFO:
+                    ROS_INFO_STREAM_ONCE(ros::this_node::getName() << ": " << s);
+                    break;
+                case log_level::WARN:
+                    ROS_WARN_STREAM_ONCE(ros::this_node::getName() << ": " << s);
+                    break;
+                case log_level::ERROR:
+                    ROS_ERROR_STREAM_ONCE(ros::this_node::getName() << ": " << s);
+                    break;
+                case log_level::FATAL:
+                    ROS_FATAL_STREAM_ONCE(ros::this_node::getName() << ": " << s);
+                    break;
+                default:
+                    break;
+                }
+        } else
+        {
+            switch (logLevel)
+            {
+            case log_level::DEBUG:
+                ROS_DEBUG_STREAM(ros::this_node::getName() << ": " << s);
+                break;
+            case log_level::INFO:
+                ROS_INFO_STREAM(ros::this_node::getName() << ": " << s);
+                break;
+            case log_level::WARN:
+                ROS_WARN_STREAM(ros::this_node::getName() << ": " << s);
+                break;
+            case log_level::ERROR:
+                ROS_ERROR_STREAM(ros::this_node::getName() << ": " << s);
+                break;
+            case log_level::FATAL:
+                ROS_FATAL_STREAM(ros::this_node::getName() << ": " << s);
+                break;
+            default:
+                break;
+            }
         }
     }
 

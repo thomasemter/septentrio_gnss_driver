@@ -72,9 +72,7 @@ namespace io {
 
     CommunicationCore::~CommunicationCore()
     {
-        telegramHandler_.clearSemaphores();
-
-        resetSettings();
+        node_->log(log_level::DEBUG, "Shutting down CommunicationCore.");
 
         running_ = false;
         auto telegram = std::make_shared<Telegram>();
@@ -82,20 +80,27 @@ namespace io {
         processingThread_.join();
     }
 
-    void CommunicationCore::close() { manager_->close(); }
+    void CommunicationCore::close()
+    {
+        telegramHandler_.clearSemaphores();
+
+        resetSettings();
+
+        manager_->close();
+    }
 
     void CommunicationCore::resetSettings()
     {
         if (!manager_->connected())
+        {
             return;
+        }
         if (settings_->configure_rx && !settings_->read_from_sbf_log &&
             !settings_->read_from_pcap)
         {
             resetMainConnection();
             send("sdio, " + mainConnectionPort_ + ", auto, none\x0D");
-            // Turning off all current SBF/NMEA output
-            send("sso, all, none, none, off \x0D");
-            send("sno, all, none, none, off \x0D");
+
             if ((settings_->udp_port != 0) && (!settings_->udp_ip_server.empty()))
             {
                 send("siss, " + settings_->udp_ip_server + ",  0\x0D");
@@ -104,7 +109,10 @@ namespace io {
             {
                 if (!ntrip.id.empty() && !ntrip.keep_open)
                 {
-                    send("snts, " + ntrip.id + ", off \x0D");
+                    std::stringstream ss;
+                    ss << "snts, " << ntrip.id << ", off,  \"\", "
+                       << "0,  \"\",  \"\", off, " << " v2, off \x0D";
+                    send(ss.str());
                 }
             }
             for (auto ip_server : settings_->rtk.ip_server)
@@ -159,6 +167,13 @@ namespace io {
                     send(ss.str());
                 }
             }
+            for (auto stream : streamsToStop_)
+            {
+                std::stringstream ss;
+                ss << "sno, Stream" << std::to_string(stream)
+                   << ", none, none, off \x0D";
+                send(ss.str());
+            }
 
             if (!settings_->login_user.empty() && !settings_->login_password.empty())
                 send("logout \x0D");
@@ -167,6 +182,7 @@ namespace io {
 
     void CommunicationCore::connect()
     {
+        node_->log(log_level::INFO, "This is ROSaic driver version 1.4.6.");
         node_->log(log_level::DEBUG, "Called connect() method");
         node_->log(
             log_level::DEBUG,
@@ -442,8 +458,6 @@ namespace io {
             {
                 if (!ntrip.id.empty())
                 {
-                    // First disable any existing NTRIP connection on NTR1
-                    send("snts, " + ntrip.id + ", off \x0D");
                     {
                         std::stringstream ss;
                         ss << "snts, " << ntrip.id << ", Client, " << ntrip.caster
@@ -494,6 +508,8 @@ namespace io {
                         std::stringstream ss;
                         ss << "sno, Stream" << std::to_string(stream) << ", "
                            << ip_server.id << ", GGA, " << rate << " \x0D";
+                        if (!ip_server.keep_open)
+                            streamsToStop_.push_back(stream);
                         ++stream;
                         send(ss.str());
                     }
@@ -521,6 +537,8 @@ namespace io {
                         std::stringstream ss;
                         ss << "sno, Stream" << std::to_string(stream) << ", "
                            << serial.port << ", GGA, " << rate << " \x0D";
+                        if (!serial.keep_open)
+                            streamsToStop_.push_back(stream);
                         ++stream;
                         send(ss.str());
                     }

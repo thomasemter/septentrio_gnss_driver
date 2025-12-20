@@ -3,11 +3,11 @@
 <img src="ROSaicLogo.png" width="60%">
 
 ## Overview
-This repository hosts drivers for ROS 1 (Melodic and Noetic) and ROS 2 (Foxy, Galactic, Humble, Iron, Rolling, and beyond) - written in C++ - that work with [mosaic](https://web.septentrio.com/GH-SSN-modules) and [AsteRx](https://web.septentrio.com/INS-SSN-Rx) - two of Septentrio's cutting-edge GNSS and GNSS/INS [receiver families](https://web.septentrio.com/GH-SSN-RX) - and beyond. Both ROS 1 and ROS 2 are supported within one repository.
+This repository hosts drivers for ROS 1 (Melodic and Noetic) and ROS 2 (Foxy, Galactic, Humble, Iron, Jazzy, Kilted, Rolling, and beyond) - written in C++ - that work with [mosaic](https://web.septentrio.com/GH-SSN-modules) and [AsteRx](https://web.septentrio.com/INS-SSN-Rx) - two of Septentrio's cutting-edge GNSS and GNSS/INS [receiver families](https://web.septentrio.com/GH-SSN-RX) - and beyond. Both ROS 1 and ROS 2 are supported within one repository.
 
 Main Features:
 - Supports Septentrio's single antenna GNSS, dual antenna GNSS and INS receivers
-- Supports serial, TCP/IP and USB connections, the latter being compatible with both serial (RNDIS) and TCP/IP protocols
+- Supports serial, TCP, UDP and USB connections, the latter being compatible with both serial (RNDIS) and TCP/IP protocols
 - Supports several ASCII (including key NMEA ones) messages and SBF (Septentrio Binary Format) blocks
 - Reports status of AIM+ (Advanced Interference Mitigation including OSNMA) anti-jamming and anti-spoofing.
 - Can publish `nav_msgs/Odometry` message for INS receivers
@@ -15,10 +15,10 @@ Main Features:
 - Supports optional axis convention conversion since Septentrio follows the NED convention, whereas ROS is ENU.
 - Easy configuration of multiple RTK corrections simultaneously (via NTRIP, TCP/IP stream, or serial)
 - Can play back PCAP capture logs for testing purposes
-- Tested with the mosaic-X5, mosaic-H, AsteRx-m3 Pro+, AsteRx-SB Pro+ and the AsteRx-SBi3 Pro receiver
+- Tested with the mosaic G5, mosaic-X5, mosaic-H, AsteRx-m3 Pro+, AsteRx-SB Pro+ and the AsteRx-SBi3 Pro receivers
 - Easy to add support for more log types
 
-Please [let the maintainers know](mailto:githubuser@septentrio.com?subject=[GitHub]%20ROSaic) of your success or failure in using the driver with other devices so we can update this page appropriately.
+Please [let the maintainers know](mailto:githubuser@septentrio.com?subject=[GitHub]%20ROSaic) of your success or failure in using the driver with other devices so we can update this page appropriately. If you need help, reach out to [Septentrio Support](https://customersupport.septentrio.com/s/).
 
 ## Usage
 
@@ -46,6 +46,7 @@ Please [let the maintainers know](mailto:githubuser@septentrio.com?subject=[GitH
     * INS with firmware < 1.4 does not support OSNMA.
     * INS with firmware < 1.4.1 does not support improved VSM handling allowing for unknown variances.
     * INS does not support PTP server clock as of now.
+    * Mosaic G5 with firmware < 1.0.1 is not supported.
  + Known issues:
     * UDP over USB: Blocks are sent twice on GNSS with firmware <= 4.12.1 and INS with firmware <= 1.4. For GNSS it is fixed in version 4.14 (released on June 15th 2023), for INS is fixed in 1.4.1 (released November 2023).
   + If `use_ros_axis_orientation` to `true` axis orientations are converted by the driver between NED (Septentrio: yaw = 0 is north, positive clockwise) and ENU (ROS: yaw = 0 is east, positive counterclockwise). There is no conversion when setting this parameter to `false` and the angles will be consistent with the web GUI in this case.
@@ -281,13 +282,15 @@ Please [let the maintainers know](mailto:githubuser@septentrio.com?subject=[GitH
 <details>
 <summary>ROS</summary>
 This driver functions on ROS 1 [Melodic](https://wiki.ros.org/melodic/Installation/Ubuntu) and [Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu) or ROS 2 [Foxy](https://docs.ros.org/en/foxy/Installation.html), [Galactic](https://docs.ros.org/en/galactic/Installation.html), [Humble](https://docs.ros.org/en/humble/Installation.html)
-[Iron](https://docs.ros.org/en/iron/Installation.html), [Jazzy](https://docs.ros.org/en/jazzy/Installation.html), and [Rolling](https://docs.ros.org/en/rolling/Installation.html) (Ubuntu 18.04, 20.04, 22.04, or 24.04 respectively). It is thus necessary to install the ROS version that has been designed for your Linux distro.</details>
+[Iron](https://docs.ros.org/en/iron/Installation.html), [Jazzy](https://docs.ros.org/en/jazzy/Installation.html), [Kilted](https://docs.ros.org/en/kilted/Installation.html), and [Rolling](https://docs.ros.org/en/rolling/Installation.html) (Ubuntu 18.04, 20.04, 22.04, or 24.04 respectively). It is thus necessary to install the ROS version that has been designed for your Linux distro.</details>
 
 ### Installation via apt
 <details>
 <summary>Binary Install</summary>
   
-  The binary release is available for ROS 1 (Melodic and Noetic) and ROS 2 (Foxy, Galactic, Humble, Iron, Jazzy, and Rolling). Since Melodic, Foxy, and Galactic are EOL, only Noetic, Humble, Iron, Jazzy, and Rolling will get updated versions. To install the binary package, simply run `sudo apt-get install ros-$ROS_DISTRO-septentrio-gnss-driver`.
+  The binary release is available for ROS 1 (Melodic and Noetic) and ROS 2 (Foxy, Galactic, Humble, Iron, Jazzy, and Rolling). Since Melodic, Foxy, and Galactic are EOL, only Noetic, Humble, Iron, Jazzy, and Rolling will get updated versions. To install the binary package, simply run `sudo apt-get install ros-$ROS_DISTRO-septentrio-gnss-driver`. 
+  
+  Be aware, that ROS 1 and [EOL'd](https://docs.ros.org/en/rolling/Releases/End-of-Life.html) ROS 2 distributions including their 3rd party packages do not get updated anymore. To get the most current version in this case, the driver may also be built from source.
 </details>
 
 ### Build from source

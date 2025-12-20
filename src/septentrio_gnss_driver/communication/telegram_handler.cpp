@@ -85,7 +85,8 @@ namespace io {
                     node_->setIsIns();
                 }
 
-                if (block_in_string.find("Heading") != std::string::npos)
+                if ((block_in_string.find("Heading") != std::string::npos) ||
+                    (block_in_string.find("Main+Aux1") != std::string::npos))
                 {
                     node_->setHasHeading();
                 }
@@ -131,7 +132,7 @@ namespace io {
             {
                 node_->log(
                     log_level::WARN,
-                    "Rx does not support PTP server clock. GNSS needs firmare >= 4.14., INS does not support it yet.");
+                    "Rx does not support PTP server clock. GNSS needs firmware >= 4.14., INS does not support it yet.");
             } else
             {
                 node_->log(

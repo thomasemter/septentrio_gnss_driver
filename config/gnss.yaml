@@ -97,9 +97,9 @@ publish:
   publish_only_valid: false
   navsatfix: true
   gpsfix: true
-  gpgga: true
-  gprmc: true
-  gpst: true
+  gpgga: false
+  gprmc: false
+  gpst: false
   measepoch: true
   pvtcartesian: true
   pvtgeodetic: true

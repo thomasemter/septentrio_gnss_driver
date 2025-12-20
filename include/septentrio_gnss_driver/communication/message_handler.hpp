@@ -210,8 +210,11 @@ namespace io {
          * @brief Map of NMEA messgae IDs and uint8_t
          */
         std::unordered_map<std::string, uint8_t> nmeaMap_{
-            {"$GPGGA", 0}, {"$INGGA", 0}, {"$GPRMC", 1}, {"$INRMC", 1},
-            {"$GPGSA", 2}, {"$INGSA", 2}, {"$GAGSV", 3}, {"$INGSV", 3}};
+            {"$GPGGA", 0}, {"$INGGA", 0}, {"$GNGGA", 0}, {"$GAGGA", 0},
+            {"$GBGGA", 0}, {"$GPRMC", 1}, {"$INRMC", 1}, {"$GNRMC", 1},
+            {"$GARMC", 1}, {"$GBRMC", 1}, {"$GPGSA", 2}, {"$INGSA", 2},
+            {"$GNGSA", 2}, {"$GAGSA", 2}, {"$GBGSA", 2}, {"$GPGSV", 3},
+            {"$INGSV", 3}, {"$GNGSV", 3}, {"$GAGSV", 3}, {"$GBGSV", 3}};
 
         /**
          * @brief Since NavSatFix etc. need PVTGeodetic, incoming PVTGeodetic blocks

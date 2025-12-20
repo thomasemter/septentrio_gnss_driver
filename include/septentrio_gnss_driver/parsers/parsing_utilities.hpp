@@ -526,8 +526,19 @@ namespace parsing_utilities {
         return std::isnan(val) ? -1.0 : deg2radSq(val);
     }
 
+    inline double convertAutoCovarianceNaN(double val)
+    {
+        return std::isnan(val) ? -1.0 : val;
+    }
+
     inline double convertCovariance(double val)
     {
         return std::isnan(val) ? 0.0 : deg2radSq(val);
     }
+
+    inline double convertCovarianceNaN(double val)
+    {
+        return std::isnan(val) ? 0.0 : val;
+    }
+
 } // namespace parsing_utilities

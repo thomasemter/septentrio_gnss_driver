@@ -97,7 +97,7 @@ namespace io {
         virtual void close() = 0;
         //! Sends commands to the receiver
         virtual void send(const std::string& cmd) = 0;
-        bool connected() { return false; };
+        virtual bool connected() = 0;
     };
 
     /**
@@ -385,13 +385,8 @@ namespace io {
                                 }
                                 default:
                                 {
-                                    std::stringstream ss;
-                                    ss << std::hex << currByte;
-                                    node_->log(
-                                        log_level::DEBUG,
-                                        "AsyncManager sync byte 2 read fault, should never come here.. Received byte was " +
-                                            ss.str());
-                                    resync();
+                                    telegram_->type = telegram_type::UNKNOWN;
+                                    readUnknown();
                                     break;
                                 }
                                 }
@@ -399,71 +394,29 @@ namespace io {
                             }
                             case 2:
                             {
-                                switch (currByte)
+                                if ((currByte == NMEA_SYNC_BYTE_3) ||
+                                    (currByte == NMEA_SYNC_BYTE_3a) ||
+                                    (currByte == NMEA_SYNC_BYTE_3b) ||
+                                    (currByte == NMEA_SYNC_BYTE_3c) ||
+                                    (currByte == NMEA_INS_SYNC_BYTE_3) ||
+                                    (currByte == RESPONSE_SYNC_BYTE_3) ||
+                                    (currByte == RESPONSE_SYNC_BYTE_3a))
+                                    readString();
+                                else if (ERROR_SYNC_BYTE_3)
                                 {
-                                case NMEA_SYNC_BYTE_3:
+                                    telegram_->type = telegram_type::ERROR_RESPONSE;
+                                    readString();
+                                } else
                                 {
-                                    if (telegram_->type == telegram_type::NMEA)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case NMEA_INS_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::NMEA_INS)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case RESPONSE_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case RESPONSE_SYNC_BYTE_3a:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                        readString();
-                                    else
-                                        resync();
-                                    break;
-                                }
-                                case ERROR_SYNC_BYTE_3:
-                                {
-                                    if (telegram_->type == telegram_type::RESPONSE)
-                                    {
-                                        telegram_->type =
-                                            telegram_type::ERROR_RESPONSE;
-                                        readString();
-                                    } else
-                                        resync();
-                                    break;
-                                }
-                                default:
-                                {
-                                    std::stringstream ss;
-                                    ss << std::hex << currByte;
-                                    node_->log(
-                                        log_level::DEBUG,
-                                        "AsyncManager sync byte 3 read fault, should never come here. Received byte was " +
-                                            ss.str());
-                                    resync();
-                                    break;
-                                }
+                                    telegram_->type = telegram_type::UNKNOWN;
+                                    readUnknown();
                                 }
                                 break;
                             }
                             default:
                             {
-                                node_->log(
-                                    log_level::DEBUG,
-                                    "AsyncManager sync read fault, unknown sync byte 2 found.");
-                                resync();
+                                telegram_->type = telegram_type::UNKNOWN;
+                                readUnknown();
                                 break;
                             }
                             }
@@ -615,12 +568,15 @@ namespace io {
                         {
                         case SYNC_BYTE_1:
                         {
+                            node_->log(
+                                log_level::DEBUG,
+                                "AsyncManager string read fault, sync 1 found: " +
+                                    std::string(telegram_->message.begin(),
+                                                telegram_->message.end()));
+
                             telegram_ = std::make_shared<Telegram>();
                             telegram_->message[0] = buf_[0];
                             telegram_->stamp = node_->getTime();
-                            node_->log(
-                                log_level::DEBUG,
-                                "AsyncManager string read fault, sync 1 found.");
                             readSync<1>();
                             break;
                         }

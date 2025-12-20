@@ -283,27 +283,53 @@ public:
      * @param[in] logLevel Log level
      * @param[in] s String to log
      */
-    void log(log_level::LogLevel logLevel, const std::string& s) const
+    void log(log_level::LogLevel logLevel, const std::string& s,
+             bool once = false) const
     {
-        switch (logLevel)
+        if (once)
         {
-        case log_level::DEBUG:
-            RCLCPP_DEBUG_STREAM(this->get_logger(), s);
-            break;
-        case log_level::INFO:
-            RCLCPP_INFO_STREAM(this->get_logger(), s);
-            break;
-        case log_level::WARN:
-            RCLCPP_WARN_STREAM(this->get_logger(), s);
-            break;
-        case log_level::ERROR:
-            RCLCPP_ERROR_STREAM(this->get_logger(), s);
-            break;
-        case log_level::FATAL:
-            RCLCPP_FATAL_STREAM(this->get_logger(), s);
-            break;
-        default:
-            break;
+            switch (logLevel)
+            {
+            case log_level::DEBUG:
+                RCLCPP_DEBUG_STREAM_ONCE(this->get_logger(), s);
+                break;
+            case log_level::INFO:
+                RCLCPP_INFO_STREAM_ONCE(this->get_logger(), s);
+                break;
+            case log_level::WARN:
+                RCLCPP_WARN_STREAM_ONCE(this->get_logger(), s);
+                break;
+            case log_level::ERROR:
+                RCLCPP_ERROR_STREAM_ONCE(this->get_logger(), s);
+                break;
+            case log_level::FATAL:
+                RCLCPP_FATAL_STREAM_ONCE(this->get_logger(), s);
+                break;
+            default:
+                break;
+            }
+        } else
+        {
+            switch (logLevel)
+            {
+            case log_level::DEBUG:
+                RCLCPP_DEBUG_STREAM(this->get_logger(), s);
+                break;
+            case log_level::INFO:
+                RCLCPP_INFO_STREAM(this->get_logger(), s);
+                break;
+            case log_level::WARN:
+                RCLCPP_WARN_STREAM(this->get_logger(), s);
+                break;
+            case log_level::ERROR:
+                RCLCPP_ERROR_STREAM(this->get_logger(), s);
+                break;
+            case log_level::FATAL:
+                RCLCPP_FATAL_STREAM(this->get_logger(), s);
+                break;
+            default:
+                break;
+            }
         }
     }
 
