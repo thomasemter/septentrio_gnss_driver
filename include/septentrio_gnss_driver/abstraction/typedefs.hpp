@@ -194,7 +194,7 @@ class ROSaicNodeBase : public rclcpp::Node
 public:
     ROSaicNodeBase(const rclcpp::NodeOptions& options) :
         Node("septentrio_gnss", options), tf2Publisher_(this),
-        tfBuffer_(this->get_clock()), tfListener_(tfBuffer_)
+        tfBuffer_(this->get_clock()), tfListener_(tfBuffer_, this)
     {
     }
 
