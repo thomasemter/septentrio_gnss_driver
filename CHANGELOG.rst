@@ -7,6 +7,7 @@ Changelog for package septentrio_gnss_driver
 * New features
     * Add parameter to set INS motion constraint (firmware >= 1.5 required)
     * Configured settings may be persisted
+    * Publishing NMEA messages as nmea_msgs/Sentence (thanks @luukromeijn and @ubicray)
 * Improvements
     * Rework IO components
     * ENU/NED data handling
@@ -31,7 +32,7 @@ Changelog for package septentrio_gnss_driver
     * TCP reconnect
     * Device regex
     * VSM server logic and string malforming
-* Contributors: @vpe-ct2mc, Claude, Thomas Emter, Tibor Dome, septentrio-users
+* Contributors: @luukromeijn, @ubicray, @vpe-ct2mc, Claude, Thomas Emter, Tibor Dome, septentrio-users
 
 
 1.4.8 (2026-08-01)
