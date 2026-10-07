@@ -537,6 +537,15 @@ namespace io {
                 }
             }
 
+            // Configure PPP
+            if (settings_->ppp)
+            {
+                send("spm, , +PPP \x0D");
+            } else
+            {
+                send("spm, , -PPP \x0D");
+            }
+
             // Configuring the corrections connection
             for (auto ntrip : settings_->rtk.ntrip)
             {

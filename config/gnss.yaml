@@ -44,6 +44,8 @@ receiver_type: gnss
 
 multi_antenna: true
 
+ppp: false
+
 datum: Default
 
 att_offset:

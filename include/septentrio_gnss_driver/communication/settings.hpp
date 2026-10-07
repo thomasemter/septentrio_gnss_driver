@@ -240,6 +240,8 @@ struct Settings
     double pitch_offset;
     //! INS multiantenna
     bool multi_antenna;
+    //! Precise Point Positioning
+    bool ppp;
     //! INS solution reference point
     bool ins_use_poi;
     //! For heading computation when unit is powered-cycled
