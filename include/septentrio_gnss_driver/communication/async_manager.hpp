@@ -176,6 +176,7 @@ namespace io {
         //! connection loss until close() is called
         std::thread connectThread_;
         std::mutex connectMutex_;
+        StopSignal stop_;
         //! Invoked after the connection was reestablished
         std::function<void()> reconnectedCallback_;
 
@@ -241,6 +242,7 @@ namespace io {
     void AsyncManager<IoType>::close()
     {
         running_ = false;
+        stop_.requestStop();
         connected_ = false;
         node_->log(log_level::DEBUG, "AsyncManager shutting down threads");
         ioInterface_.requestStop();
@@ -301,7 +303,7 @@ namespace io {
                 connected_ = ioInterface_.connect();
                 if (!connected_)
                 {
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    stop_.waitUnlessStopped(std::chrono::seconds(1));
                     continue;
                 }
                 if (reconnectedCallback_)

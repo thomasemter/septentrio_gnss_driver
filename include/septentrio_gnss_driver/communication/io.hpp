@@ -32,7 +32,9 @@
 
 // C++
 #include <atomic>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <thread>
 
 // Linux
@@ -68,6 +70,33 @@ const static std::array<uint32_t, 21> baudrates = {
 
 namespace io {
 
+    class StopSignal
+    {
+    public:
+        void requestStop()
+        {
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                stopRequested_ = true;
+            }
+            cv_.notify_all();
+        }
+
+        [[nodiscard]] bool stopRequested() const { return stopRequested_; }
+
+        void waitUnlessStopped(std::chrono::milliseconds duration)
+        {
+            std::unique_lock<std::mutex> lock(mtx_);
+            cv_.wait_for(lock, duration,
+                         [this] { return stopRequested_.load(); });
+        }
+
+    private:
+        std::mutex mtx_;
+        std::condition_variable cv_;
+        std::atomic<bool> stopRequested_ = false;
+    };
+
     class UdpClient
     {
     public:
@@ -82,6 +111,7 @@ namespace io {
         ~UdpClient()
         {
             running_ = false;
+            stop_.requestStop();
 
             node_->log(log_level::INFO, "UDP client shutting down threads");
             ioContext_.stop();
@@ -233,7 +263,7 @@ namespace io {
         {
             while (running_)
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                stop_.waitUnlessStopped(std::chrono::milliseconds(1000));
 
                 if (running_ && ioContext_.stopped())
                 {
@@ -266,6 +296,7 @@ namespace io {
         //! Pointer to the node
         ROSaicNodeBase* node_;
         std::atomic<bool> running_;
+        StopSignal stop_;
         uint16_t port_;
         boost::asio::io_context ioContext_;
         std::thread ioThread_;
@@ -304,7 +335,7 @@ namespace io {
 
         void setPort(const std::string& port) { port_ = port; }
 
-        void requestStop() { stopRequested_ = true; }
+        void requestStop() { stop_.requestStop(); }
 
         [[nodiscard]] bool connect()
         {
@@ -328,7 +359,7 @@ namespace io {
                                    std::to_string(CONNECT_RETRY_DELAY_MS) +
                                    " ms ...");
                 }
-                std::this_thread::sleep_for(
+                stop_.waitUnlessStopped(
                     std::chrono::milliseconds(CONNECT_RETRY_DELAY_MS));
                 endpoints = resolver.resolve(node_->settings()->device_tcp_ip,
                                              port_, resolveEc);
@@ -378,7 +409,7 @@ namespace io {
                                 std::to_string(CONNECT_RETRY_DELAY_MS) +
                                 " ms ...");
                     }
-                    std::this_thread::sleep_for(
+                    stop_.waitUnlessStopped(
                         std::chrono::milliseconds(CONNECT_RETRY_DELAY_MS));
                     ec = connectInternal(endpoints);
                 }
@@ -434,7 +465,7 @@ namespace io {
         }
 
     private:
-        bool keepGoing() const { return node_->ok() && !stopRequested_; }
+        bool keepGoing() const { return node_->ok() && !stop_.stopRequested(); }
 
         boost::system::error_code connectInternal(
             const boost::asio::ip::tcp::resolver::results_type& endpoints)
@@ -540,7 +571,7 @@ namespace io {
         //! connectInternal(). Only accessed from the connecting thread.
         uint16_t lastLocalPort_ = 0;
 
-        std::atomic<bool> stopRequested_ = false;
+        StopSignal stop_;
 
     public:
         std::unique_ptr<boost::asio::ip::tcp::socket> stream_;
@@ -562,7 +593,7 @@ namespace io {
 
         void close() { stream_->close(); }
 
-        void requestStop() { stopRequested_ = true; }
+        void requestStop() { stop_.requestStop(); }
 
         [[nodiscard]] bool connect()
         {
@@ -592,7 +623,7 @@ namespace io {
                                                      ". Will retry every second.");
 
                     using namespace std::chrono_literals;
-                    std::this_thread::sleep_for(1s);
+                    stop_.waitUnlessStopped(1s);
                 }
             }
             if (!opened)
@@ -694,7 +725,7 @@ namespace io {
                     return false;
                 }
                 using namespace std::chrono_literals;
-                std::this_thread::sleep_for(500ms);
+                stop_.waitUnlessStopped(500ms);
 
                 try
                 {
@@ -733,13 +764,13 @@ namespace io {
         }
 
     private:
-        bool keepGoing() const { return node_->ok() && !stopRequested_; }
+        bool keepGoing() const { return node_->ok() && !stop_.stopRequested(); }
 
         ROSaicNodeBase* node_;
         std::shared_ptr<boost::asio::io_context> ioContext_;
         std::string flowcontrol_;
         uint32_t baudrate_;
-        std::atomic<bool> stopRequested_ = false;
+        StopSignal stop_;
 
     public:
         std::unique_ptr<boost::asio::serial_port> stream_;
