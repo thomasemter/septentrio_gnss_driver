@@ -2769,6 +2769,9 @@ namespace io {
                 static const int32_t gnss_g5_major = 1;
                 static const int32_t gnss_g5_minor = 1;
                 static const int32_t gnss_g5_patch = 0;
+                static const int32_t gnss_v2_major = 2;
+                static const int32_t gnss_v2_minor = 0;
+                static const int32_t gnss_v2_patch = 0;
                 boost::tokenizer<> tok(last_receiversetup_.rx_version);
                 boost::tokenizer<>::iterator it = tok.begin();
                 std::vector<int32_t> major_minor_patch;
@@ -2845,10 +2848,9 @@ namespace io {
                         }
                     } else if (settings_->septentrio_receiver_type == "gnss")
                     {
-                        if ((major_minor_patch[0] < 4))
+                        if (major_minor_patch[0] == 1)
                         {
-                            if ((major_minor_patch[0] == 1) &&
-                                (major_minor_patch[1] == 0) &&
+                            if ((major_minor_patch[1] == 0) &&
                                 (major_minor_patch[2] == 0))
                             {
                                 node_->log(
@@ -2869,6 +2871,25 @@ namespace io {
                                         std::to_string(gnss_g5_major) + "." +
                                         std::to_string(gnss_g5_minor) + "." +
                                         std::to_string(gnss_g5_patch) +
+                                        " or consult README.");
+                            }
+                        } else if (major_minor_patch[0] < 4)
+                        {
+                            if ((major_minor_patch[0] < gnss_v2_major) ||
+                                ((major_minor_patch[0] == gnss_v2_major) &&
+                                 (major_minor_patch[1] < gnss_v2_minor)) ||
+                                ((major_minor_patch[0] == gnss_v2_major) &&
+                                 (major_minor_patch[1] == gnss_v2_minor) &&
+                                 (major_minor_patch[2] < gnss_v2_patch)))
+                            {
+                                node_->log(
+                                    log_level::WARN,
+                                    "GNSS RB3 receiver has firmware version: " +
+                                        last_receiversetup_.rx_version +
+                                        ", which may not support all features. Please update to at least " +
+                                        std::to_string(gnss_v2_major) + "." +
+                                        std::to_string(gnss_v2_minor) + "." +
+                                        std::to_string(gnss_v2_patch) +
                                         " or consult README.");
                             }
                         } else

@@ -37,7 +37,7 @@ Please [let the maintainers know](mailto:githubuser@septentrio.com?subject=[GitH
   ROS 2: Launch as composition with `ros2 launch septentrio_gnss_driver rover.launch.py` to use `rover.yaml` or add  `file_name:=xxx.yaml` to use a custom config. Alternatively launch as node with `ros2 launch septentrio_gnss_driver rover_node.launch.py` to use `rover_node.yaml` or add  `file_name:=xxx.yaml` to use a custom config. Specify the communication parameters, the ROS messages to be published, the frequency at which the latter should happen etc.
   + Besides the aforementioned config file `rover.yaml` containing all parameters, specialized launch files for GNSS `config/gnss.yaml` and INS `config/ins.yaml` respectively contain only the relevant parameters in each case.
   - NOTE: Unless `configure_rx` is set to `false`, this driver will overwrite the previous values of the parameters, even if the value is left to zero in the "yaml" file.
-  + The driver was developed and tested with firmware versions >= 4.10.0 for GNSS and >= 1.3.2 for INS. Receivers with older firmware versions are supported but some features may not be available. Known limitations are:
+  + The driver was developed and tested with firmware versions >= 4.14.0 for GNSS and >= 1.5.0 for INS. RB3 GNSS with firmware >= 2.0.0 has not been tested so fra, but should be supported. Receivers with older firmware versions are supported but some features may not be available. Known limitations are:
     * GNSS with firmware < 4.10.0 does not support IP over USB.    
     * GNSS with firmware < 4.12.1 does not support OSNMA.
     * GNSS with firmware < 4.14 does not support PTP server clock.
