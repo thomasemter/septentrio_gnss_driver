@@ -2808,9 +2808,9 @@ namespace io {
                         static const int32_t ins_iv_major = 1;
                         static const int32_t ins_iv_minor = 4;
                         static const int32_t ins_iv_patch = 1;
-                        if ((major_minor_patch[0] >= ins_iv_major) ||
+                        if ((major_minor_patch[0] > ins_iv_major) ||
                             ((major_minor_patch[0] == ins_iv_major) &&
-                             (major_minor_patch[1] >= ins_iv_minor)) ||
+                             (major_minor_patch[1] > ins_iv_minor)) ||
                             ((major_minor_patch[0] == ins_iv_major) &&
                              (major_minor_patch[1] == ins_iv_minor) &&
                              (major_minor_patch[2] >= ins_iv_patch)))
