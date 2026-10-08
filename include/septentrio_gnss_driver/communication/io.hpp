@@ -31,6 +31,8 @@
 #pragma once
 
 // C++
+#include <atomic>
+#include <memory>
 #include <thread>
 
 // Linux
@@ -302,6 +304,8 @@ namespace io {
 
         void setPort(const std::string& port) { port_ = port; }
 
+        void requestStop() { stopRequested_ = true; }
+
         [[nodiscard]] bool connect()
         {
             boost::asio::ip::tcp::resolver::results_type endpoints;
@@ -329,7 +333,7 @@ namespace io {
             {
                 boost::system::error_code ec = connectInternal(endpoints);
                 uint32_t failedAttempts = 0;
-                while (node_->ok() && ec)
+                while (keepGoing() && ec)
                 {
                     ++failedAttempts;
 
@@ -417,15 +421,17 @@ namespace io {
         }
 
     private:
+        bool keepGoing() const { return node_->ok() && !stopRequested_; }
+
         boost::system::error_code connectInternal(
             const boost::asio::ip::tcp::resolver::results_type& endpoints)
         {
             if (ioContext_->stopped())
                 ioContext_->restart();
 
-            boost::system::error_code ec;
+            auto ec = std::make_shared<boost::system::error_code>(
+                boost::asio::error::would_block);
             deadline_.expires_after(std::chrono::seconds(10));
-            ec = boost::asio::error::would_block;
 
             // When reconnecting, bind to the local port of the lost connection
             // so the new connection reuses its 4-tuple. If the Rx still holds
@@ -470,22 +476,23 @@ namespace io {
                 // The range overload of async_connect closes and reopens the
                 // socket, which would discard the bind; connect to the first
                 // endpoint directly.
-                stream_->async_connect(endpoints.begin()->endpoint(),
-                                       boost::lambda::var(ec) =
-                                           boost::lambda::_1);
+                stream_->async_connect(
+                    endpoints.begin()->endpoint(),
+                    [ec](const boost::system::error_code& error) { *ec = error; });
             } else
             {
-                boost::asio::async_connect(*stream_, endpoints,
-                                           boost::lambda::var(ec) =
-                                               boost::lambda::_1);
+                boost::asio::async_connect(
+                    *stream_, endpoints,
+                    [ec](const boost::system::error_code& error,
+                         const boost::asio::ip::tcp::endpoint&) { *ec = error; });
             }
 
-            while (node_->ok() && (ec == boost::asio::error::would_block))
+            while (keepGoing() && (*ec == boost::asio::error::would_block))
             {
                 if (ioContext_->run_one() == 0)
                     break;
             }
-            return ec;
+            return *ec;
         }
 
         void checkDeadline()
@@ -520,6 +527,8 @@ namespace io {
         //! connectInternal(). Only accessed from the connecting thread.
         uint16_t lastLocalPort_ = 0;
 
+        std::atomic<bool> stopRequested_ = false;
+
     public:
         std::unique_ptr<boost::asio::ip::tcp::socket> stream_;
     };
@@ -540,6 +549,8 @@ namespace io {
 
         void close() { stream_->close(); }
 
+        void requestStop() { stopRequested_ = true; }
+
         [[nodiscard]] bool connect()
         {
             if (stream_->is_open())
@@ -549,7 +560,7 @@ namespace io {
 
             bool opened = false;
 
-            while (!opened && node_->ok())
+            while (!opened && keepGoing())
             {
                 try
                 {
@@ -642,6 +653,8 @@ namespace io {
                            std::to_string(current_baudrate.value()));
             for (uint8_t i = 0; i < baudrates.size(); i++)
             {
+                if (!keepGoing())
+                    return false;
                 if (current_baudrate.value() == baudrate_)
                 {
                     break; // Break if the desired baudrate has been reached.
@@ -707,10 +720,13 @@ namespace io {
         }
 
     private:
+        bool keepGoing() const { return node_->ok() && !stopRequested_; }
+
         ROSaicNodeBase* node_;
         std::shared_ptr<boost::asio::io_context> ioContext_;
         std::string flowcontrol_;
         uint32_t baudrate_;
+        std::atomic<bool> stopRequested_ = false;
 
     public:
         std::unique_ptr<boost::asio::serial_port> stream_;
@@ -738,6 +754,8 @@ namespace io {
             if (stream_)
                 stream_->close();
         }
+
+        void requestStop() {}
 
         [[nodiscard]] bool connect()
         {
@@ -798,6 +816,8 @@ namespace io {
             if (stream_)
                 stream_->close();
         }
+
+        void requestStop() {}
 
         [[nodiscard]] bool connect()
         {

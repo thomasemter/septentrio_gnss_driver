@@ -63,6 +63,7 @@
 #include <atomic>
 #include <deque>
 #include <functional>
+#include <mutex>
 
 // Boost includes
 #include <boost/asio.hpp>
@@ -174,6 +175,7 @@ namespace io {
         //! Owns the connection lifecycle: runs the io context and reconnects on
         //! connection loss until close() is called
         std::thread connectThread_;
+        std::mutex connectMutex_;
         //! Invoked after the connection was reestablished
         std::function<void()> reconnectedCallback_;
 
@@ -210,13 +212,14 @@ namespace io {
     template <typename IoType>
     AsyncManager<IoType>::~AsyncManager()
     {
-        if (connected_)
-            close();
+        close();
     }
 
     template <typename IoType>
     [[nodiscard]] bool AsyncManager<IoType>::connect()
     {
+        std::lock_guard<std::mutex> lock(connectMutex_);
+
         if (running_)
             return connected_;
 
@@ -240,9 +243,12 @@ namespace io {
         running_ = false;
         connected_ = false;
         node_->log(log_level::DEBUG, "AsyncManager shutting down threads");
+        ioInterface_.requestStop();
         ioContext_->stop();
+        std::lock_guard<std::mutex> lock(connectMutex_);
         if (connectThread_.joinable())
             connectThread_.join();
+        connected_ = false;
         ioInterface_.close();
         node_->log(log_level::DEBUG, "AsyncManager threads stopped");
     }

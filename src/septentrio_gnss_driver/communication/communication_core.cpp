@@ -100,6 +100,10 @@ namespace io {
 
         if (manager_)
             manager_->close();
+        if (tcpClient_)
+            tcpClient_->close();
+        if (tcpVsm_)
+            tcpVsm_->close();
     }
 
     void CommunicationCore::resetSettings()
@@ -1110,7 +1114,7 @@ namespace io {
             if ((settings_->ins_vsm.ros_source == "odometry") ||
                 (settings_->ins_vsm.ros_source == "twist"))
             {
-                if (!settings_->ins_vsm.use_stream_device &&
+                if (!tcpVsm_ && !settings_->ins_vsm.use_stream_device &&
                     !settings_->ins_vsm.ip_server.empty())
                 {
                     tcpVsm_ = std::make_unique<AsyncManager<TcpIo>>(node_,
