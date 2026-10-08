@@ -475,7 +475,7 @@ namespace rosaic_node {
             param("rtk_settings/" + ntrip + "/caster", ntripSettings.caster,
                   std::string());
             getPortParam("rtk_settings/" + ntrip + "/caster_port",
-                         ntripSettings.caster_port, static_cast<uint16_t>(0));
+                         ntripSettings.caster_port, static_cast<uint16_t>(2101));
             param("rtk_settings/" + ntrip + "/username", ntripSettings.username,
                   std::string());
             param("rtk_settings/" + ntrip + "/password", ntripSettings.password,

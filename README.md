@@ -584,7 +584,7 @@ The following is a list of ROSaic parameters found in the `config/rover.yaml` fi
       + `caster`: is the hostname or IP address of the NTRIP caster to connect to.
         + default: ""
       + `caster_port`: IP port of the NTRIP caster.
-        + default: 2021
+        + default: 2101
       + `username`: user name for the NTRIP caster.
         + default: ""
       + `pasword`: password for the NTRIP caster. The receiver encrypts the password so that it cannot be read back with the command "getNtripSettings".
