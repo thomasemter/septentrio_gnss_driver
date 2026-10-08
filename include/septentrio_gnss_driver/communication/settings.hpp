@@ -51,7 +51,7 @@ struct RtkNtrip
     //! Hostname or IP address of the NTRIP caster to connect to
     std::string caster;
     //! IP port number of NTRIP caster to connect to
-    uint32_t caster_port;
+    uint16_t caster_port;
     //! Username for NTRIP service
     std::string username;
     //! Password for NTRIP service
@@ -78,7 +78,7 @@ struct RtkIpServer
     std::string id;
     //! Rx TCP port number, e.g. 28785, on which Rx receives the corrections
     //! (can't be the same as main connection unless localhost concept is used)
-    uint32_t port;
+    uint16_t port;
     //! RTCM version for correction data
     std::string rtk_standard;
     //! Whether (and at which rate) or not to send GGA to the NTRIP caster
@@ -124,7 +124,7 @@ struct InsVsm
     //! VSM IP server id
     std::string ip_server;
     //! VSM tcp port
-    uint32_t ip_server_port;
+    uint16_t ip_server_port;
     //! Wether VSM shall be kept open om shutdown
     bool ip_server_keep_open;
     //! VSM serial port
@@ -160,13 +160,13 @@ struct Settings
     //! TCP port
     std::string device_tcp_port;
     //! UDP port
-    uint32_t udp_port;
+    uint16_t udp_port;
     //! UDP unicast destination ip
     std::string udp_unicast_ip;
     //! UDP IP server id
     std::string udp_ip_server;
     //! TCP port
-    uint32_t tcp_port;
+    uint16_t tcp_port;
     //! TCP IP server id
     std::string tcp_ip_server;
     //! Username for login

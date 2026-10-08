@@ -71,7 +71,7 @@ namespace io {
     class UdpClient
     {
     public:
-        UdpClient(ROSaicNodeBase* node, int16_t port, TelegramQueue* telegramQueue) :
+        UdpClient(ROSaicNodeBase* node, uint16_t port, TelegramQueue* telegramQueue) :
             node_(node), running_(true), port_(port), telegramQueue_(telegramQueue)
         {
             connect();
@@ -266,7 +266,7 @@ namespace io {
         //! Pointer to the node
         ROSaicNodeBase* node_;
         std::atomic<bool> running_;
-        int16_t port_;
+        uint16_t port_;
         boost::asio::io_context ioContext_;
         std::thread ioThread_;
         std::thread watchdogThread_;

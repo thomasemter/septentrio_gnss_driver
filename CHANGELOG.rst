@@ -30,7 +30,8 @@ Changelog for package septentrio_gnss_driver
     * Locale independence
     * NMEA parsers
     * Reconnect and IO threading
-    * TCP reconnect
+    * TCP reconnect and teardown
+    * Serial reconnect
     * Device regex
     * VSM server logic and string malforming
 * Contributors: @luukromeijn, @ubicray, @vpe-ct2mc, Claude, Thomas Emter, Tibor Dome, septentrio-users

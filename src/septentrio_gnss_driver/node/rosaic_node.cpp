@@ -117,12 +117,12 @@ namespace rosaic_node {
                        static_cast<uint32_t>(921600));
         param("serial.hw_flow_control", settings_.hw_flow_control,
               static_cast<std::string>("off"));
-        getUint32Param("stream_device.tcp.port", settings_.tcp_port,
-                       static_cast<uint32_t>(0));
+        getPortParam("stream_device.tcp.port", settings_.tcp_port,
+                     static_cast<uint16_t>(0));
         param("stream_device.tcp.ip_server", settings_.tcp_ip_server,
               static_cast<std::string>(""));
-        getUint32Param("stream_device.udp.port", settings_.udp_port,
-                       static_cast<uint32_t>(0));
+        getPortParam("stream_device.udp.port", settings_.udp_port,
+                     static_cast<uint16_t>(0));
         param("stream_device.udp.unicast_ip", settings_.udp_unicast_ip,
               static_cast<std::string>(""));
         param("stream_device.udp.ip_server", settings_.udp_ip_server,
@@ -484,8 +484,8 @@ namespace rosaic_node {
 
             param("rtk_settings." + ntrip + ".caster", ntripSettings.caster,
                   std::string());
-            getUint32Param("rtk_settings." + ntrip + ".caster_port",
-                           ntripSettings.caster_port, static_cast<uint32_t>(0));
+            getPortParam("rtk_settings." + ntrip + ".caster_port",
+                         ntripSettings.caster_port, static_cast<uint16_t>(0));
             param("rtk_settings." + ntrip + ".username", ntripSettings.username,
                   std::string());
             param("rtk_settings." + ntrip + ".password", ntripSettings.password,
@@ -526,8 +526,8 @@ namespace rosaic_node {
             if (ipSettings.id.empty())
                 continue;
 
-            getUint32Param("rtk_settings." + ips + ".port", ipSettings.port,
-                           static_cast<uint32_t>(0));
+            getPortParam("rtk_settings." + ips + ".port", ipSettings.port,
+                         static_cast<uint16_t>(0));
             param("rtk_settings." + ips + ".rtk_standard", ipSettings.rtk_standard,
                   std::string("auto"));
             param("rtk_settings." + ips + ".send_gga", ipSettings.send_gga,
@@ -641,9 +641,9 @@ namespace rosaic_node {
             }
             if (!settings_.ins_vsm.ip_server.empty())
             {
-                getUint32Param("ins_vsm.ip_server.port",
-                               settings_.ins_vsm.ip_server_port,
-                               static_cast<uint32_t>(24786));
+                getPortParam("ins_vsm.ip_server.port",
+                             settings_.ins_vsm.ip_server_port,
+                             static_cast<uint16_t>(24786));
                 param("ins_vsm.ip_server.keep_open",
                       settings_.ins_vsm.ip_server_keep_open, true);
                 this->log(

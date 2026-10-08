@@ -277,6 +277,34 @@ public:
     }
 
     /**
+     * @brief Gets a port number from the parameter server
+     * @param[in] name The key to be used in the parameter server's dictionary
+     * @param[out] val Storage for the retrieved value
+     * @param[in] defaultVal Value to use if the server doesn't contain this
+     * parameter or the value is outside the port range
+     */
+    bool getPortParam(const std::string& name, uint16_t& val,
+                      uint16_t defaultVal)
+    {
+        uint32_t tempVal;
+        if (!getUint32Param(name, tempVal, defaultVal))
+        {
+            val = defaultVal;
+            return false;
+        }
+        if (tempVal > 65535)
+        {
+            this->log(log_level::ERROR,
+                      "Parameter " + name + " exceeds the port range, using " +
+                          std::to_string(defaultVal) + ".");
+            val = defaultVal;
+            return false;
+        }
+        val = static_cast<uint16_t>(tempVal);
+        return true;
+    }
+
+    /**
      * @brief Gets parameter of type T from the parameter server
      * @param[in] name The key to be used in the parameter server's dictionary
      * @param[out] val Storage for the retrieved value, of type T
