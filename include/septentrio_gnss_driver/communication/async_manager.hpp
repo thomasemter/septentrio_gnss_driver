@@ -500,6 +500,9 @@ namespace io {
     template <typename IoType>
     void AsyncManager<IoType>::handleReadError(const boost::system::error_code& ec)
     {
+        if (ec == boost::asio::error::operation_aborted)
+            return;
+
         ++consecutiveReadErrors_;
         if ((boost::asio::error::eof == ec) ||
             (boost::asio::error::network_unreachable == ec) ||
