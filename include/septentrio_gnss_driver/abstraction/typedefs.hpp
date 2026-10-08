@@ -221,7 +221,7 @@ public:
 
     ~ROSaicNodeBase() {}
 
-    bool ok() { return rclcpp::ok(); }
+    bool ok() const { return rclcpp::ok(); }
 
     const Settings* settings() const { return &settings_; }
 

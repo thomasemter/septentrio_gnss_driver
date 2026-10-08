@@ -809,7 +809,7 @@ namespace rosaic_node {
                                   TransformStampedMsg& T_s_t) const
     {
         bool found = false;
-        while (!found)
+        while (!found && this->ok())
         {
             try
             {
