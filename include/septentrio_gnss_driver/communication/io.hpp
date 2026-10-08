@@ -308,20 +308,33 @@ namespace io {
 
         [[nodiscard]] bool connect()
         {
-            boost::asio::ip::tcp::resolver::results_type endpoints;
-
-            try
+            boost::asio::ip::tcp::resolver resolver(*ioContext_);
+            boost::system::error_code resolveEc;
+            boost::asio::ip::tcp::resolver::results_type endpoints =
+                resolver.resolve(node_->settings()->device_tcp_ip, port_,
+                                 resolveEc);
+            uint32_t failedResolves = 0;
+            while (keepGoing() && resolveEc)
             {
-                boost::asio::ip::tcp::resolver resolver(*ioContext_);
-                endpoints =
-                    resolver.resolve(node_->settings()->device_tcp_ip, port_);
-            } catch (const std::runtime_error& e)
-            {
-                node_->log(log_level::ERROR,
-                           "Could not resolve " + node_->settings()->device_tcp_ip +
-                               " on port " + port_ + ": " + e.what());
-                return false;
+                ++failedResolves;
+                if ((failedResolves == 1) ||
+                    ((failedResolves % LOG_EVERY_NTH_RETRY) == 0))
+                {
+                    node_->log(log_level::ERROR,
+                               "Could not resolve " +
+                                   node_->settings()->device_tcp_ip + " on port " +
+                                   port_ + ": " + resolveEc.message() +
+                                   ". Retrying every " +
+                                   std::to_string(CONNECT_RETRY_DELAY_MS) +
+                                   " ms ...");
+                }
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(CONNECT_RETRY_DELAY_MS));
+                endpoints = resolver.resolve(node_->settings()->device_tcp_ip,
+                                             port_, resolveEc);
             }
+            if (resolveEc)
+                return false;
 
             stream_ = std::make_unique<boost::asio::ip::tcp::socket>(*ioContext_);
 
