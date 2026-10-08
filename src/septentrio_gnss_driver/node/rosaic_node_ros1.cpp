@@ -452,7 +452,8 @@ namespace rosaic_node {
         // INS solution reference point
         param("ins_use_poi", settings_.ins_use_poi, false);
 
-        if (settings_.publish_tf && !settings_.ins_use_poi)
+        if ((settings_.publish_tf || settings_.publish_tf_ecef) &&
+            !settings_.ins_use_poi)
         {
             this->log(
                 log_level::ERROR,
