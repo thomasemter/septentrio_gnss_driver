@@ -209,29 +209,27 @@ namespace io {
             log_level::DEBUG,
             "Started timer for calling connect() method until connection succeeds");
 
-        if (initializeIo())
+        initializedIo_ = initializeIo();
+        if (initializedIo_ && manager_)
         {
-            if (manager_)
+            // Streams received via an IP server of the Rx survive a
+            // reconnection, only streams tied to the dynamic connection
+            // descriptor necessitate reconfiguration on reconnect
+            if (settings_->configure_rx &&
+                (settings_->device_type == device_type::TCP) && !tcpClient_ &&
+                !udpClient_)
             {
-                // Streams received via an IP server of the Rx survive a
-                // reconnection, only streams tied to the dynamic connection
-                // descriptor necessitate reconfiguration on reconnect
-                if (settings_->configure_rx &&
-                    (settings_->device_type == device_type::TCP) && !tcpClient_ &&
-                    !udpClient_)
-                {
-                    manager_->setReconnectedCallback([this]() {
-                        ++configGeneration_;
-                        telegramHandler_.wakeConfigWaiters();
-                        reconfigureSemaphore_.notify();
-                    });
-                    reconfigureThread_ = std::thread(
-                        std::bind(&CommunicationCore::runReconfigure, this));
-                }
-                initializedIo_ = manager_->connect();
-                if (!initializedIo_)
-                    return;
+                manager_->setReconnectedCallback([this]() {
+                    ++configGeneration_;
+                    telegramHandler_.wakeConfigWaiters();
+                    reconfigureSemaphore_.notify();
+                });
+                reconfigureThread_ = std::thread(
+                    std::bind(&CommunicationCore::runReconfigure, this));
             }
+            initializedIo_ = manager_->connect();
+            if (!initializedIo_)
+                return;
         }
         // If node is shut down before a connection could be established
         if (!node_->ok())
