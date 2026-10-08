@@ -70,8 +70,6 @@ namespace io {
         node_(node), settings_(node->settings()), telegramHandler_(node),
         running_(true)
     {
-        running_ = true;
-
         processingThread_ =
             std::thread(std::bind(&CommunicationCore::processTelegrams, this));
     }
@@ -207,7 +205,6 @@ namespace io {
             log_level::DEBUG,
             "Started timer for calling connect() method until connection succeeds");
 
-        boost::asio::io_context io;
         if (initializeIo())
         {
             if (manager_)
@@ -345,11 +342,7 @@ namespace io {
             telegramHandler_.resetSemaphores();
             uint8_t stream = 1;
             streamsToStop_.clear();
-            // Determining communication mode: TCP vs USB/Serial
-            boost::smatch match;
-            boost::regex_match(settings_->device, match,
-                               boost::regex("(tcp)://(.+):(\\d+)"));
-            std::string proto(match[1]);
+
             mainConnectionPort_ = resetMainConnection();
             if (mainConnectionPort_.empty())
             {
@@ -491,8 +484,6 @@ namespace io {
                 if (settings_->multi_antenna)
                 {
                     std::stringstream ss;
-                    // FIX: was settings_->ant_type — Aux1 must use its own
-                    // ant_aux1_type
                     ss << "sat, Aux1, \"" << settings_->ant_aux1_type << "\""
                        << "\x0D";
                     send(ss.str());
@@ -689,7 +680,7 @@ namespace io {
                         settings_->theta_z >= ANGLE_MIN &&
                         settings_->theta_z <= ANGLE_MAX)
                     {
-                        ss << " sio, " << "manual" << ", "
+                        ss << "sio, " << "manual" << ", "
                            << string_utilities::trimDecimalPlaces(settings_->theta_x)
                            << ", "
                            << string_utilities::trimDecimalPlaces(settings_->theta_y)

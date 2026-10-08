@@ -2256,14 +2256,16 @@ namespace io {
     }
 
     template <typename M>
-    void MessageHandler::publishNmeaSentence(const std::string& message, const M& msg)
+    void MessageHandler::publishNmeaSentence(const std::string& message,
+                                             const M& msg)
     {
         if (!settings_->publish_nmea_sentence)
             return;
 
         NmeaSentenceMsg sentence_msg;
         sentence_msg.header = msg.header;
-        sentence_msg.sentence = message.substr(0, message.find_last_not_of("\r\n") + 1);
+        sentence_msg.sentence =
+            message.substr(0, message.find_last_not_of("\r\n") + 1);
         publish<NmeaSentenceMsg>("nmea_sentence", sentence_msg);
     }
 
@@ -3068,7 +3070,6 @@ namespace io {
                 break;
             }
             case 3:
-            case 4:
             {
                 // Create NmeaSentence struct to pass to GpgsvParser::parseASCII
                 NMEASentence gsv_message(id, body);

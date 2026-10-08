@@ -170,7 +170,7 @@ namespace io {
         ROSaicNodeBase* node_;
         std::shared_ptr<boost::asio::io_context> ioContext_;
         IoType ioInterface_;
-        std::atomic<bool> running_;
+        std::atomic<bool> running_ = false;
         //! Owns the connection lifecycle: runs the io context and reconnects on
         //! connection loss until close() is called
         std::thread connectThread_;
@@ -274,8 +274,7 @@ namespace io {
     }
 
     template <typename IoType>
-    void AsyncManager<IoType>::setReconnectedCallback(
-        std::function<void()> callback)
+    void AsyncManager<IoType>::setReconnectedCallback(std::function<void()> callback)
     {
         reconnectedCallback_ = callback;
     }
@@ -370,10 +369,10 @@ namespace io {
                     return;
                 }
 
-                node_->log(log_level::DEBUG, "AsyncManager sent the following " +
-                                                 std::to_string(sent.size()) +
-                                                 " bytes to the Rx: " +
-                                                 printable(sent));
+                node_->log(log_level::DEBUG,
+                           "AsyncManager sent the following " +
+                               std::to_string(sent.size()) +
+                               " bytes to the Rx: " + printable(sent));
 
                 if (!writeQueue_.empty())
                     doWrite();
@@ -528,8 +527,8 @@ namespace io {
                 {
                     if (numBytes == (SBF_HEADER_SIZE - 2))
                     {
-                        uint16_t length = telegram_parser::getSbfLength(
-                            telegram_->message.data());
+                        uint16_t length =
+                            telegram_parser::getSbfLength(telegram_->message.data());
                         // Rejecting invalid lengths matters: readSbf() computes
                         // length - SBF_HEADER_SIZE in size_t, so a corrupted
                         // length below 8 underflows into a ~2^64-byte read into
@@ -653,8 +652,8 @@ namespace io {
                         case LF:
                         {
                             if (telegram_parser::isNmeaEnd(
-                                    telegram_->message[telegram_->message.size() -
-                                                       2],
+                                    telegram_
+                                        ->message[telegram_->message.size() - 2],
                                     buf_[0]))
                                 telegramQueue_->push(telegram_);
                             else

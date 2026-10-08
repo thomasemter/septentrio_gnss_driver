@@ -102,6 +102,7 @@ namespace rosaic_node {
         param("leap_seconds", settings_.leap_seconds, -128);
 
         param("configure_rx", settings_.configure_rx, true);
+        param("persist_configuration", settings_.persist_configuration, false);
 
         param("custom_commands_file", settings_.custom_commands_file,
               static_cast<std::string>(""));
