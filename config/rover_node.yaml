@@ -20,6 +20,8 @@ septentrio_gnss_driver:
 
     configure_rx: true
 
+    persist_configuration: false
+
     custom_commands_file: ""  
 
     osnma:

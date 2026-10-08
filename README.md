@@ -398,7 +398,7 @@ This driver functions on ROS 1 [Melodic](https://wiki.ros.org/melodic/Installati
     - Specify the IMU-antenna lever arm in the vehicle reference frame. This is the vector starting from the IMU reference point to the ARP of the main GNSS antenna. This can be done by means of the `ins_spatial_config.ant_lever_arm` parameter.
     - Specify `ins_spatial_config.vsm_lever_arm` if measurements of a velocity sensor is available.
     - Alternatively the lever arms may be specified via tf. Set `get_spatial_config_from_tf`to `true` in this case.
-    - If the point of interest is neither the IMU nor the ARP of the main GNSS antenna, the vector between the IMU and the point of interest can be provided with the `ins_solution/poi_lever_arm` parameter.
+    - If the point of interest is neither the IMU nor the ARP of the main GNSS antenna, the vector between the IMU and the point of interest can be provided with the `ins_spatial_config.poi_lever_arm` parameter.
     
   - For further more information about Septentrio receivers, visit Septentrio [support resources](https://www.septentrio.com/en/supportresources) or check out the [user manual](https://www.septentrio.com/system/files/support/asterx_sbi3_user_manual_v1.0_0.pdf) and [reference guide](https://www.septentrio.com/system/files/support/asterx_sbi3_pro_firmware_v1.3.0_reference_guide.pdf) of the AsteRx SBi3 receiver.
 
@@ -419,10 +419,9 @@ The following is a list of ROSaic parameters found in the `config/rover.yaml` fi
     + default: `tcp://192.168.3.1:28784 `
   + `serial`: specifications for serial communication
     + `baudrate`: serial baud rate to be used in a serial connection. Ensure the provided rate is sufficient for the chosen SBF blocks. For example, activating MeasEpoch (also necessary for /gpsfix) may require up to almost 400 kBit/s.
-    + `rx_serial_port`: determines to which (virtual) serial port of the Rx we want to get connected to, e.g. USB1 or COM1
     + `hw_flow_control`: specifies whether the serial (the Rx's COM ports, not USB1 or USB2) connection to the Rx should have UART hardware flow control enabled or not
       + `off` to disable UART hardware flow control, `RTS|CTS` to enable it
-    + default: `921600`, `USB1`, `off`
+    + default: `921600`, `off`
   + `stream_device`: If left unconfigured, by default `device` is utilized for the data streams. Within `stream_device` static IP servers may be defined instead. In config mode (`configure_rx` set to `true`), TCP will be prioritized over UDP. If Rx is pre-configured, both may be set simultaneously. In this case (`configure_rx` set to `false` and a stream device configured) no connection to `device` is established, since it is not needed. With `stream_device.tcp` the host address is still taken from `device`; if only `stream_device.udp` is configured, `device` may also be left empty.
     + `tcp`: specifications for static TCP server of SBF blocks and NMEA sentences.
       + `ip_server`: IP server of Rx to be used, e.g. “IPS1”.
@@ -610,7 +609,7 @@ The following is a list of ROSaic parameters found in the `config/rover.yaml` fi
       + `port`: its port number of the connection that ROSaic establishes on the receiver. When selecting a port number, make sure to avoid conflicts with other services.
         + default: 0
       + `rtk_standard`: determines the RTK standard, options are `auto`, `RTCMv2`, `RTCMv3`, or `CMRv2`.
-        + default: ""
+        + default: "auto"
       + `send_gga`: specifies whether or not to send NMEA GGA messages to the NTRIP caster, and at which rate. It must be one of `auto`, `off`, `sec1`, `sec5`, `sec10` or `sec60`. In `auto` mode, the receiver sends with `sec1`.
         + default: "auto"
       + `keep_open`: determines wether this connection shall be kept open. If set to `true` the Rx will still be able to receive RTK corrections to improve precision after driver is shut down.
@@ -665,7 +664,7 @@ The following is a list of ROSaic parameters found in the `config/rover.yaml` fi
       + default: `5` degrees, `10` meters    
     + `ins_use_poi`: Whether or not to use the POI defined in `ins_spatial_config.poi_lever_arm`
       + If true, the point at which the INS navigation solution (e.g. in `insnavgeod` ROS topic) is calculated will be the POI as defined above (`poi_frame_id`), otherwise it'll be the main GNSS antenna (`frame_id`). Has to be set to `true` if tf shall be published.
-      + default: `true`
+      + default: `false`
     + `ins_vsm`: Configuration of the velocity sensor measurements. IP server may be used to receive velocity information from ROS or from an external device. Serial connection may be used to receive velocity information from an external device only.
       + `ros`: VSM info received from ROS msgs
         + `source`: Specifies which ROS message type shall be used, options are `odometry` or `twist`. Accordingly, a subscriber is established of the type [`nav_msgs/Odometry.msg`](https://docs.ros2.org/foxy/api/nav_msgs/msg/Odometry.html) or [`geometry_msgs/TwistWithCovarianceStamped.msg`](https://docs.ros2.org/foxy/api/geometry_msgs/msg/TwistWithCovarianceStamped.html) listening on the topics `odometry_vsm` or `twist_vsm` respectively. Only linear velocities are evaluated. Measurements have to be with respect to the frame aligned with the vehicle and defined by `ins_spatial_config.vsm_lever_arm` or tf-frame `vsm_frame_id`, see also comment in [`nav_msgs/Odometry.msg`](https://docs.ros2.org/foxy/api/nav_msgs/msg/Odometry.html) that twist should be specified in `child_frame_id`. VSM data is sent to the receiver via TCP as set in the sub parameter `ip_server`.

@@ -233,8 +233,6 @@ namespace rosaic_node {
             settings_.publish_tf = false;
         }
 
-        settings::autoPublish(this, settings_);
-
         // Datum and marker-to-ARP offset
         param("datum", settings_.datum, std::string("Default"));
         // WGS84 is equivalent to Default and kept for backwards compatibility
