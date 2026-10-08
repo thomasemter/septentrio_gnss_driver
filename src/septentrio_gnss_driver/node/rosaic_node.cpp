@@ -629,6 +629,15 @@ namespace rosaic_node {
             }
 
             param("ins_vsm.ip_server.id", settings_.ins_vsm.ip_server, ipid);
+            if (!settings_.ins_vsm.ip_server.empty() &&
+                (settings_.ins_vsm.ip_server == settings_.tcp_ip_server) &&
+                !ins_use_vsm)
+            {
+                this->log(
+                    log_level::ERROR,
+                    "ins_vsm.ip_server.id is the stream device, which is already in use by the node and cannot serve an external VSM source -> VSM input will not be used!");
+                settings_.ins_vsm.ip_server = "";
+            }
             if (!settings_.ins_vsm.ip_server.empty())
             {
                 getUint32Param("ins_vsm.ip_server.port",

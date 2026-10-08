@@ -153,7 +153,8 @@ namespace io {
                              ", baud115200, bits8, No, bit1, none\x0D");
                 }
             }
-            if (!settings_->ins_vsm.ip_server.empty())
+            if (!settings_->ins_vsm.use_stream_device &&
+                !settings_->ins_vsm.ip_server.empty())
             {
                 if (!settings_->ins_vsm.ip_server_keep_open)
                 {
@@ -1068,7 +1069,8 @@ namespace io {
 
             if (settings_->septentrio_receiver_type == "ins")
             {
-                if (!settings_->ins_vsm.ip_server.empty())
+                if (!settings_->ins_vsm.use_stream_device &&
+                    !settings_->ins_vsm.ip_server.empty())
                 {
                     send("siss, " + settings_->ins_vsm.ip_server + ", " +
                          std::to_string(settings_->ins_vsm.ip_server_port) +
@@ -1085,22 +1087,12 @@ namespace io {
                     send("sdio, " + settings_->ins_vsm.serial_port + ", NMEA\x0D");
                 }
 
-                if ((settings_->ins_vsm.ros_source == "odometry") ||
-                    (settings_->ins_vsm.ros_source == "twist"))
+                if (settings_->ins_vsm.use_stream_device &&
+                    ((settings_->ins_vsm.ros_source == "odometry") ||
+                     (settings_->ins_vsm.ros_source == "twist")))
                 {
-                    if (settings_->ins_vsm.use_stream_device)
-                    {
-                        send("sdio, " + settings_->tcp_ip_server +
-                             ", NMEA, +NMEA +SBF\x0D");
-                    } else if (!settings_->ins_vsm.ip_server.empty())
-                    {
-                        send("siss, " + settings_->ins_vsm.ip_server + ", " +
-                             std::to_string(settings_->ins_vsm.ip_server_port) +
-                             ", TCP2Way \x0D");
-
-                        send("sdio, " + settings_->ins_vsm.ip_server +
-                             ", NMEA, none\x0D");
-                    }
+                    send("sdio, " + settings_->tcp_ip_server +
+                         ", NMEA, +NMEA +SBF\x0D");
                 }
             }
             // Save config to boot

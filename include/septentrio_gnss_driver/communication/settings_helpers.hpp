@@ -127,12 +127,6 @@ namespace settings {
     {
         if (!settings.ins_vsm.ip_server.empty())
         {
-            if (!settings.ins_vsm.use_stream_device &&
-                !settings.tcp_ip_server.empty() &&
-                (settings.tcp_ip_server == settings.ins_vsm.ip_server))
-                node->log(
-                    log_level::ERROR,
-                    "stream_device.tcp.ip_server and ins_vsm.ip_server.id cannot use the same IP server");
             if (!settings.udp_ip_server.empty() &&
                 (settings.udp_ip_server == settings.ins_vsm.ip_server))
                 node->log(
