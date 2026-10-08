@@ -13,7 +13,7 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
   "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(WARNFLAGS "-Wall -Wextra -Wpedantic -Wcast-align -Wnon-virtual-dtor -Woverloaded-virtual -Wcast-qual -Wctor-dtor-privacy")
+set(WARNFLAGS -Wall -Wextra -Wpedantic -Wcast-align -Wnon-virtual-dtor -Woverloaded-virtual -Wcast-qual -Wctor-dtor-privacy)
 
 ## System dependencies are found with CMake's conventions
 if(POLICY CMP0167)
@@ -133,6 +133,7 @@ if(catkin_FOUND)
   )
   target_compile_definitions(${PROJECT_NAME}_node PUBLIC ROS1)
   target_compile_features(${PROJECT_NAME}_node PUBLIC cxx_std_17)
+  target_compile_options(${PROJECT_NAME}_node PRIVATE ${WARNFLAGS})
  
   # Installation
   install(TARGETS ${PROJECT_NAME}_node
@@ -237,6 +238,7 @@ elseif(ament_cmake_FOUND)
   )
   target_compile_definitions(${library_name} PUBLIC ROS2)
   target_compile_features(${library_name} PUBLIC cxx_std_17)
+  target_compile_options(${library_name} PRIVATE ${WARNFLAGS})
   target_include_directories(${library_name} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"  
     "$<INSTALL_INTERFACE:include>"
@@ -284,6 +286,7 @@ elseif(ament_cmake_FOUND)
   target_link_libraries(${executable_name}
     ${library_name}
   )
+  target_compile_options(${executable_name} PRIVATE ${WARNFLAGS})
 
   rclcpp_components_register_nodes(${library_name} "rosaic_node::ROSaicNode")
 

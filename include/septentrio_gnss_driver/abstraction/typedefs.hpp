@@ -341,7 +341,7 @@ public:
             return false;
         }
         return true;
-    };
+    }
 
     /**
      * @brief Log function to provide abstraction of ROS loggers

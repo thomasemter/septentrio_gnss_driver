@@ -1826,7 +1826,7 @@ namespace io {
                     {
                         uint16_t pvt_status_value =
                             (channel_state_info.pvt_status & pvt_status_mask) >>
-                            k - 1;
+                            (k - 1);
                         if (pvt_status_value == 2)
                         {
                             pvt_status = true;
