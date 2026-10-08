@@ -535,15 +535,15 @@ namespace io {
                        << settings_->ant_aux1_serial_nr << "\x0D";
                     send(ss.str());
                 }
-            }
 
-            // Configure PPP
-            if (settings_->ppp)
-            {
-                send("spm, , +PPP \x0D");
-            } else
-            {
-                send("spm, , -PPP \x0D");
+                // Configure PPP
+                if (settings_->ppp)
+                {
+                    send("spm, , +PPP \x0D");
+                } else
+                {
+                    send("spm, , -PPP \x0D");
+                }
             }
 
             // Configuring the corrections connection
@@ -1279,10 +1279,10 @@ namespace io {
                 ++timeouts;
                 if ((timeouts % UNRESPONSIVE_TIMEOUTS) == 0)
                 {
-                    node_->log(log_level::ERROR,
-                               "No response received from Rx to command " +
-                                   printable(cmd) +
-                                   ", connection assumed lost or stuck, reconnecting.");
+                    node_->log(
+                        log_level::ERROR,
+                        "No response received from Rx to command " + printable(cmd) +
+                            ", connection assumed lost or stuck, reconnecting.");
                     manager_.get()->triggerReconnect();
                 }
                 // Only every third timeout triggers a resend: commands altering
