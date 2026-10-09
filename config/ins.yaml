@@ -58,8 +58,6 @@ receiver_type: ins
 
 multi_antenna: true
 
-ppp: false
-
 datum: Default
 
 att_offset:

@@ -8,7 +8,6 @@ Changelog for package septentrio_gnss_driver
     * Add parameter to set INS motion constraint (firmware >= 1.5 required)
     * Configured settings may be persisted
     * Publishing NMEA messages as nmea_msgs/Sentence (thanks @luukromeijn and @ubicray)
-    * Add PPP parameter (Galileo HAS) (thanks @luukromeijn)
 * Improvements
     * Rework IO components
     * ENU/NED data handling

@@ -58,8 +58,6 @@ receiver_type: gnss
 
 multi_antenna: true
 
-ppp: false
-
 datum: Default
 
 poi_to_arp:

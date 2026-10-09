@@ -628,13 +628,6 @@ The following is a list of ROSaic parameters found in the `config/rover.yaml` fi
   </details>
 
   <details>
-  <summary>PPP and Galileo HAS</summary>
-  
-  + `ppp`: Enables Precise Point Positioning (PPP) when `true` and disables it when `false`, for both GNSS and INS receivers. PPP enables Galileo High Accuracy Service (HAS) when an E6-capable antenna is connected and the receiver is set up to track and use the GALE6BC signal.
-    + default: `false`
-  </details>
-  
-  <details>
   <summary>INS Specs</summary>
 
     + `ins_spatial_config`: Spatial configuration of INS/IMU. Coordinates according to vehicle related frame directions chosen by `use_ros_axis_orientation` (front-left-up if `true` and front-right-down if `false`).

@@ -55,8 +55,6 @@ septentrio_gnss_driver:
 
     multi_antenna: true
 
-    ppp: false
-
     datum: Default
 
     poi_to_arp:

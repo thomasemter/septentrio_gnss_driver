@@ -225,8 +225,8 @@ namespace io {
                     telegramHandler_.wakeConfigWaiters();
                     reconfigureSemaphore_.notify();
                 });
-                reconfigureThread_ = std::thread(
-                    std::bind(&CommunicationCore::runReconfigure, this));
+                reconfigureThread_ =
+                    std::thread(std::bind(&CommunicationCore::runReconfigure, this));
             }
             initializedIo_ = manager_->connect();
             if (!initializedIo_)
@@ -529,16 +529,10 @@ namespace io {
                        << settings_->ant_aux1_serial_nr << "\x0D";
                     send(ss.str());
                 }
-
-                // Configure PPP
-                if (settings_->ppp)
-                {
-                    send("spm, , +PPP \x0D");
-                } else
-                {
-                    send("spm, , -PPP \x0D");
-                }
             }
+
+            // Configure all modes allowed
+            send("spm, Rover, all, auto \x0D");
 
             // Configuring the corrections connection
             for (auto ntrip : settings_->rtk.ntrip)
